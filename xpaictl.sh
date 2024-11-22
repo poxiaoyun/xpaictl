@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 # Get the current path
 script_path=$(realpath "$0")

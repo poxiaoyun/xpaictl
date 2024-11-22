@@ -51,12 +51,15 @@ function usage() {
 # Parse the configuration file and convert the content to environment variables
 function parse_config() {
     local config_file="$1"
+    local output_env_file="artifacts/env"
     local product="Environment"
 
     if [[ ! -f "$config_file" ]]; then
         log ERROR $product "Configuration file $config_file does not exist!"
         return 1
     fi
+
+    > "$output_env_file" || { log ERROR $product "Failed to create or clear $output_env_file"; return 1; }
 
     while IFS= read -r line || [[ -n "$line" ]]; do
         # Skip comment lines and empty lines
@@ -71,6 +74,35 @@ function parse_config() {
             # Export as an environment variable
             export "$key=$value"
             log DEBUG $product "Setting environment variable: $key=$value"
+            echo "$key=$value" >> "$output_env_file"
+        fi
+    done < "$config_file"
+}
+
+function parse_config_nolog() {
+    local config_file="$1"
+    local output_env_file="artifacts/env"
+    local product="Environment"
+
+    if [[ ! -f "$config_file" ]]; then
+        return 1
+    fi
+
+    > "$output_env_file" || { return 1; }
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        # Skip comment lines and empty lines
+        [[ "$line" =~ ^#.*$ ]] && continue
+        [[ -z "$line" ]] && continue
+
+        # Match key-value pairs (key: value format)
+        if [[ "$line" =~ ^([^:]+):[[:space:]]*(.+)$ ]]; then
+            key=$(echo "${BASH_REMATCH[1]}" | xargs)
+            value=$(echo "${BASH_REMATCH[2]}" | xargs)
+
+            # Export as an environment variable
+            export "$key=$value"
+            echo "$key=$value" >> "$output_env_file"
         fi
     done < "$config_file"
 }
@@ -279,6 +311,11 @@ function get_node_count() {
     return 0
 }
 
-
-
-
+convert_image_to_tar() {
+    local input_image="$1"
+    local name_with_tag=$(echo "$input_image" | awk -F/ '{print $NF}')
+    local name=$(echo "$name_with_tag" | awk -F: '{print $1}')
+    local version=$(echo "$name_with_tag" | awk -F: '{print $2}')
+    local output_file="${name}-${version}.tar"
+    echo "$output_file"
+}

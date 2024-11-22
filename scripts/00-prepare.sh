@@ -6,7 +6,7 @@ function initSealos() {
     local product="sealos"
 
     # Navigate to the script directory
-    cd "${script_dir}/artifacts/" || { echo "$timestamp --- [module]-[${product}] Failed to change directory to ${script_dir}/artifacts/. Exiting."; return 1; }
+    cd "${script_dir}/artifacts/" || { log ERROR $product "Failed to change directory to ${script_dir}/artifacts/."; return 1; }
 
     # Extract the binary from the tarball
     log INFO sealos "Extract sealos package ${script_dir}/artifacts/${tarball}"
@@ -14,7 +14,7 @@ function initSealos() {
         chmod +x "$binary"
         mv "$binary" "$dest_dir/"
     else
-        log Error sealos "Extraction failed. Exiting."
+        log ERROR sealos "Extraction failed. Exiting."
         return 1
     fi
 

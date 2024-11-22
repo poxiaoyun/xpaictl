@@ -15,7 +15,7 @@ function main(){
 
     for script in "${installScripts[@]}"; do
         if [[ -f "${scriptDir}/${script}" ]]; then 
-            log INFO $product "source ${scriptDir}/${script}."
+            log INFO $product "Source ${scriptDir}/${script}."
             . ${scriptDir}/${script}
         else
             log ERROR $product "Cant't find script ${scriptDir}/${script}."

@@ -2,7 +2,7 @@ function installGemsImages() {
     local timestamp
     local product="gems"
     local images=(
-        "registry.cn-hangzhou.aliyuncs.com/xiaoshiai/xpai-stack:${mainVersion}-${productSuffix}"
+        "registry.cn-hangzhou.aliyuncs.com/xiaoshiai/xpai-stack:${mainVersion}"
         "registry.cn-hangzhou.aliyuncs.com/xiaoshiai/xpai-extension:${mainVersion}"
     )
 
