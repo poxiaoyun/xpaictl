@@ -1,0 +1,11 @@
+nameOverride: "xpai-minio"
+fullnameOverride: "xpai-minio"
+mode: ${minioArchitecture}
+rootUser: "minioadmin"
+rootPassword: "minioadmin"
+drivesPerNode: 1
+replicas: ${minioNums}
+pools: 1
+persistence:
+  enabled: true
+  size: 500Gi
