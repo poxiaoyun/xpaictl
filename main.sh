@@ -75,8 +75,5 @@ function main(){
     fi
     export license=${cluster}
     show_access_info
-    add_env_to_root_bashrc SEALOS_RUNTIME_ROOT "/data/.sealos"
-    add_env_to_root_bashrc SEALOS_SCP_CHECKSUM "false"
-    add_env_to_root_bashrc SEALOS_DATA_ROOT "${defaultDir}/registry"
 
 }

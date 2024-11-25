@@ -30,8 +30,8 @@ function installKubernetes() {
     if [[ -z "$workers" ]]; then
         log INFO $product "Installing Kubernetes masters: $masterss"
         sealos run docker.io/labring/kubernetes:${kubernetesVersion} \
-                    docker.io/labring/helm:v3.12.0 \
-                    docker.io/labring/calico:3.24.6 \
+                    docker.io/labring/helm:v${helmVersion:-3.12.0} \
+                    docker.io/labring/calico:${calicoVersion:-3.24.6} \
                     --masters "$masterss" \
                     --port ${sshPort:-22} \
                     --passwd ${sshPassword} \
@@ -39,8 +39,8 @@ function installKubernetes() {
     else
         log INFO $product "Installing Kubernetes masters: $masterss and workers: $nodes"
         sealos run docker.io/labring/kubernetes:${kubernetesVersion} \
-                    docker.io/labring/helm:v3.12.0 \
-                    docker.io/labring/calico:3.24.6 \
+                    docker.io/labring/helm:v${helmVersion:-3.12.0} \
+                    docker.io/labring/calico:${calicoVersion:-3.24.6} \
                     --masters "$masterss" \
                     --nodes "$nodes" \
                     --port ${sshPort:-22} \
@@ -56,7 +56,7 @@ function installKubernetes() {
 
     # Install OpenEBS
     log INFO $product "Installing OpenEBS with base path: $ebsDataDir"
-    sealos run docker.io/labring/openebs:v3.9.0 \
+    sealos run docker.io/labring/openebs:v${ebsVersion:-3.9.0} \
                 -e HELM_OPTS="--set localprovisioner.basePath=${ebsDataDir} \
                                --set ndm.enabled=false \
                                --set ndmOperator.enabled=false \

@@ -30,6 +30,7 @@ function installMinio() {
     log INFO $product "Trying to preparing minio templates."
 
     file=${templatesDir}/${template}
+    get_node_count
     
     if [ -e "${file}.template" ]; then
         log INFO $product "Templating  ${file}.template ."

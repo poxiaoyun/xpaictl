@@ -452,6 +452,7 @@ function banner(){
     echo '#           distribution, or use of this script is strictly prohibited.                   #'
     echo '#                                                                                         #'
     echo '###########################################################################################'
+    sleep 2
 }
 
 function show_access_info() {
@@ -501,22 +502,3 @@ function get_gems_license() {
   echo $(echo $response | grep -o '"cluster":"[^"]*' | sed 's/"cluster":"//')
 }
 
-function add_env_to_root_bashrc() {
-    local var_name=$1    
-    local var_value=$2   
-
-    if [ -z "$var_name" ] || [ -z "$var_value" ]; then
-        return 1
-    fi
-
-    local root_bashrc="/root/.bashrc"
-
-    if [ ! -f "$root_bashrc" ]; then
-        touch "$root_bashrc"
-    fi
-
-    if grep -q "^export $var_name=" "$root_bashrc"; then
-        sed -i "s|^export $var_name=.*|export $var_name=\"$var_value\"|" "$root_bashrc"
-    else
-    fi
-}

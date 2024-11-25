@@ -6,10 +6,19 @@ mainVersion: 1.24.6
 xpaiVersion: 1.0.8
 
 # 产品后缀,默认为空
-#productSuffix: qcloud
+# productSuffix: qcloud
 
 # Kuberntes集群版本，默认离线环境下只支持v1.25.10
 kubernetesVersion: v1.25.10
+
+# 安装Helm的版本，默认离线环境下只支持3.12.0
+# helmVersion: 3.12.0
+
+# 安装Calico的版本，默认离线环境下只支持3.24.6
+# calicoVersion: 3.24.6
+
+# 安装OpenEBS的版本，默认离线环境下只支持3.9.0
+# ebsVersion: 3.9.0
 
 # SSH 配置，部署前请确保安装集群下所有的root账号均允许远程登录
 # 在配置文件 /etc/ssh/sshd_config 中的 `PermitRootLogin yes` 设置
@@ -29,6 +38,7 @@ defaultDir: /data
 
 # 泛域名配置，默认是xpai.xiaoshi.cn:3000
 # 平台运行后创建的资源访问地址如下：
+# Dashboard： console.xpai.xiaoshiai.cn:30000
 # 数据访问： in-<随机字符>.xpai.xiaoshiai.cn:30000
 # 交互式建模: im-<随机字符>.xpai.xiaoshiai.cn:30000
 # 推理服务： inf-<随机字符>.xpai.xiaoshiai.cn:30000
