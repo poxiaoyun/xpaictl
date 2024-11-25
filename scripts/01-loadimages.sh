@@ -1,16 +1,18 @@
 function localXpaiImages() {
     local images=(
-        "xpai-stack-${mainVersion}.tar"
-        "xpai-extension-${mainVersion}.tar"
-        "xpai-stack-${mainVersion}-${productSuffix}.tar.gz"
         "kubernetes-${kubernetesVersion}.tar"
         "helm-v3.12.0.tar"
         "calico-3.24.6.tar"
         "openebs-v3.9.0.tar"
+        "xpai-stack-${mainVersion}.tar"
+        "xpai-extension-${mainVersion}.tar"
     )
     local xpaiImageDir="${script_dir}/artifacts/images"
-    local timestamp
     local product="images"
+
+	if [ -n "${productSuffix}" ]; then
+		images+=( "xpai-stack-${mainVersion}-${productSuffix}.tar" )
+	fi
 
     # Change directory to the artifacts folder
     cd "${xpaiImageDir}" || {

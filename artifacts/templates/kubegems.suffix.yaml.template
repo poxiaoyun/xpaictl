@@ -44,7 +44,7 @@ spec:
       image:
         registry: registry.cn-hangzhou.aliyuncs.com
         repository: xiaoshiai/console
-        tag: v${mainVersion}-ee
+        tag: v${mainVersion}-${productSuffix}-ee
       replicaCount: 1
       service:
         type: NodePort

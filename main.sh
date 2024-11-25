@@ -24,5 +24,59 @@ function main(){
     done
 
     initSealos
+    localXpaiImages
+    installKubernetes
+    wait_for_nodes_ready
+    installGemsImages
+    installGems
+    wait_until_running deployment kubegems-installer kubegems-installer 300
+    wait_until_running statefulset kubegems-mysql kubegems 300
+    wait_until_running statefulset kubegems-redis-master kubegems 300
+    wait_until_running deployment kubegems-api kubegems 300
+    wait_until_running deployment kubegems-dashboard kubegems 300
+    wait_until_running deployment kubegems-worker kubegems 300
+    wait_until_running deployment kubegems-msgbus kubegems 300
+    wait_until_running deployment kubegems-local-agent kubegems-local 300
+    wait_until_running deployment kubegems-local-controller kubegems-local 300
+    wait_until_running deployment kubegems-local-kubectl kubegems-local 300
+    wait_until_running deployment default-gateway kubegems-gateway 300
+    wait_until_running deployment kube-prometheus-stack-operator kubegems-monitoring 300
+    wait_until_running statefulset prometheus-kube-prometheus-stack-prometheus kubegems-monitoring 300
+    wait_until_running deployment default-gateway kubegems-gateway 300
+    if [[ "${installMinio}" == "true" ]];then 
+        installMinio
+        if [[ "${minioArchitecture}" == "standalone" ]]; then
+            wait_until_running deployment xpai-minio kubegems-pai 300
+        elif [[ "${minioArchitecture}" == "distributed" ]]; then
+            wait_until_running statefulset xpai-minio kubegems-pai 300
+        fi
+    fi
+    installNvidiaOperator
+    wait_until_running deployment gpu-operator gpu-operator 300
+    installXpai
+    wait_until_running statefulset kubegems-pai-mysql kubegems-pai 300
+    wait_until_running deployment kubegems-pai-api kubegems-pai 300
+    wait_until_running deployment kubegems-pai-controller kubegems-pai 300
+    wait_until_running deployment volcano-scheduler volcano-system 300
+    wait_until_running deployment volcano-controllers volcano-system 300
+    wait_until_running statefulset juicefs-csi-controller juicefs-system 300
+
+    host="console.${baseHost}"
+    token=$(get_gems_token ${host})
+    if [[ -z "$token" ]]; then
+      log ERROR main "Failed to retrieve token!"
+      exit 1
+    fi
+
+    cluster=$(get_gems_license ${host} ${token}) 
+    if [[ -z "$cluster" ]]; then
+      log ERROR main "Failed to retrieve cluster!"
+      exit 1
+    fi
+    export license=${cluster}
+    show_access_info
+    add_env_to_root_bashrc SEALOS_RUNTIME_ROOT "/data/.sealos"
+    add_env_to_root_bashrc SEALOS_SCP_CHECKSUM "false"
+    add_env_to_root_bashrc SEALOS_DATA_ROOT "${defaultDir}/registry"
 
 }

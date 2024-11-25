@@ -29,7 +29,7 @@ function log() {
             ;;
     esac
 
-    echo -e "${color}${timestamp} ${level} [$0]-[${module}]${RESET} ${message}"
+    echo -e "${color}${timestamp} ${level} [${module}]-[$(pwd)]${RESET} ${message}"
 }
 
 # Display help INFOrmation
@@ -172,43 +172,39 @@ function check_ssh_status() {
 }
 
 function wait_until_running() {
-    local type=$1          # Resource type: "deployment" or "statefulset"
-    local name=$2          # Name of the resource
-    local namespace=$3     # Namespace of the resource
-    local timeout=${4:-300} # Timeout in seconds, default is 300 seconds
+    local type=$1         
+    local name=$2         
+    local namespace=$3    
+    local timeout=${4:-300} 
     local product="utils"
 
-    log INFO $product "Waiting for $type '$name' in namespace '$namespace' to be running..."
+    log DEBUG $product "Waiting for $type '$name' in namespace '$namespace' to be running..."
 
     for ((i = 0; i < timeout; i+=10)); do
         if [ "$type" == "deployment" ]; then
-            # Check available replicas for a deployment
             status=$(kubectl get deployment $name -n $namespace -o jsonpath='{.status.availableReplicas}' 2>/dev/null)
         elif [ "$type" == "statefulset" ]; then
-            # Check ready replicas for a statefulset
             status=$(kubectl get statefulset $name -n $namespace -o jsonpath='{.status.readyReplicas}' 2>/dev/null)
         else
-            log error $product "Error: Unsupported resource type '$type'. Use 'deployment' or 'statefulset'. Exiting."
+            log ERROR $product "Error: Unsupported resource type '$type'. Use 'deployment' or 'statefulset'. Exiting."
             exit 1
         fi
 
-        # If the resource has at least 1 replica running/ready, it's considered running
-        if [ "$status" -ge 1 ]; then
+        if [[ "$status" -ge 1 ]]; then
             log INFO $product "$type '$name' is running."
             return
         fi
 
-        log debug $product "Still waiting for $type '$name' to be running... retrying in 10 seconds."
+        log DEBUG $product "Still waiting for $type '$name' to be running... retrying in 10 seconds."
         sleep 10
     done
     
-    log error $product "Timeout reached waiting for $type '$name' to be running. Exiting."
+    log ERROR $product "Timeout reached waiting for $type '$name' to be running. Exiting."
     exit 1
 }
 
 function checkCommand(){
     local product="utils"
-    # Check if the 'envsubst' command is available
     if ! command -v envsubst >/dev/null 2>&1; then
         log debug $product "The 'envsubst' command is not found. Please install it before proceeding."
         log debug $product "Installation instructions:"
@@ -268,37 +264,30 @@ function checkenvs(){
 
 function get_node_count() {
     local product="utils"
-    # Check if kubectl is available
     if ! command -v kubectl >/dev/null 2>&1; then
         log error $product "The 'kubectl' command is not found. Please check the [module][kubernetes] runs well."
         exit 1
     fi
 
-    # Get the number of nodes in the Kubernetes cluster
     node_count=$(kubectl get nodes --no-headers 2>/dev/null | wc -l)
 
-    # Check for errors
     if [ $? -ne 0 ]; then
         log error $product "Error: Failed to retrieve nodes. Please ensure you have access to a Kubernetes cluster."
         return 1
     fi
 
-     # Validate if the node count is a valid positive integer
     if ! [[ "$node_count" =~ ^[0-9]+$ ]]; then
         elog error $product "Error: Invalid node count retrieved: '$node_count'."
         return 1
     fi
 
-    # Calculate the largest even number less than or equal to the node count
     if (( node_count % 2 == 0 )); then
         minioNums=$node_count
     else
         minioNums=$((node_count - 1))
     fi
 
-    # Check if the environment variable minioReplicas is set and valid
     if [[ -n "$minioReplicas" ]] && [[ "$minioReplicas" =~ ^[0-9]+$ ]]; then
-        # Override largest_even with minioReplicas if it exists and is valid
         timestamp=$(get_timestamp)
         minioNums=$minioReplicas
         log debug $product "Environment variable 'minioReplicas' is set. Using its value: $minioReplicas"
@@ -311,11 +300,223 @@ function get_node_count() {
     return 0
 }
 
-convert_image_to_tar() {
+wait_for_nodes_ready() {
+    local product="utils"
+    log INFO $product "Waiting for all Kubernetes nodes to be in 'Ready' state..."
+    while true; do
+        not_ready_count=$(kubectl get nodes --no-headers | awk '$2 != "Ready" {count++} END {print count+0}')
+        if [[ "$not_ready_count" -eq 0 ]]; then
+            log INFO $product "All nodes are Ready!"
+            break
+        fi
+        not_ready_nodes=$(kubectl get nodes --no-headers | awk '$2 != "Ready" {print $1}')
+
+        log DEBUG $product "Currently $not_ready_count node(s) are not Ready: $not_ready_nodes"
+        log DEBUG $product "Retrying in 5 seconds..."
+
+        sleep 10
+    done
+}
+
+function convert_image_to_tar() {
     local input_image="$1"
     local name_with_tag=$(echo "$input_image" | awk -F/ '{print $NF}')
     local name=$(echo "$name_with_tag" | awk -F: '{print $1}')
     local version=$(echo "$name_with_tag" | awk -F: '{print $2}')
     local output_file="${name}-${version}.tar"
     echo "$output_file"
+}
+
+function detect_package_manager() {
+    if [[ -f /etc/os-release ]]; then
+        . /etc/os-release
+        os_id=$(echo "$ID" | tr '[:upper:]' '[:lower:]')
+
+        case $os_id in
+            ubuntu|debian|linuxmint|pop|kali|raspbian)
+                echo "apt" 
+                ;;
+            centos|rhel|rocky|almalinux|amazon)
+                if command -v dnf &>/dev/null; then
+                    echo "dnf" 
+                else
+                    echo "yum" 
+                fi
+                ;;
+            fedora)
+                echo "dnf" 
+                ;;
+            arch|manjaro|artix|endeavouros|garuda)
+                echo "pacman" 
+                ;;
+            opensuse|suse)
+                echo "zypper" 
+                ;;
+            alpine)
+                echo "apk" 
+                ;;
+            gentoo)
+                echo "emerge" 
+                ;;
+            void)
+                echo "xbps-install" 
+                ;;
+            *)
+                echo "unknown" 
+                ;;
+        esac
+
+    elif [[ -f /etc/lsb-release ]]; then
+        . /etc/lsb-release
+        os_id=$(echo "$DISTRIB_ID" | tr '[:upper:]' '[:lower:]')
+
+        case $os_id in
+            ubuntu|debian)
+                echo "apt"
+                ;;
+            centos|rhel)
+                echo "yum"
+                ;;
+            *)
+                echo "unknown"
+                ;;
+        esac
+
+    elif [[ -f /etc/issue ]]; then
+        os_info=$(cat /etc/issue | head -n 1 | awk '{print $1}' | tr '[:upper:]' '[:lower:]')
+
+        case $os_info in
+            ubuntu|debian)
+                echo "apt"
+                ;;
+            centos|redhat)
+                echo "yum"
+                ;;
+            arch)
+                echo "pacman"
+                ;;
+            alpine)
+                echo "apk"
+                ;;
+            suse|opensuse)
+                echo "zypper"
+                ;;
+            *)
+                echo "unknown"
+                ;;
+        esac
+
+    else
+        echo "unknown" 
+    fi
+}
+
+function namespace_exists() {
+    local namespace=$1
+    if kubectl get namespace "${namespace}" >/dev/null 2>&1; then
+        return 0  
+    else
+        return 1  
+    fi
+}
+
+function banner(){
+    echo '                                  _____                    _____                    _____          ';
+    echo '        ______                   /\    \                  /\    \                  /\    \         ';
+    echo '       |::|   |                 /::\    \                /::\    \                /::\    \        ';
+    echo '       |::|   |                /::::\    \              /::::\    \               \:::\    \       ';
+    echo '       |::|   |               /::::::\    \            /::::::\    \               \:::\    \      ';
+    echo '       |::|   |              /:::/\:::\    \          /:::/\:::\    \               \:::\    \     ';
+    echo '       |::|   |             /:::/__\:::\    \        /:::/__\:::\    \               \:::\    \    ';
+    echo '       |::|   |            /::::\   \:::\    \      /::::\   \:::\    \              /::::\    \   ';
+    echo '       |::|   |           /::::::\   \:::\    \    /::::::\   \:::\    \    ____    /::::::\    \  ';
+    echo ' ______|::|___|___ ____  /:::/\:::\   \:::\____\  /:::/\:::\   \:::\    \  /\   \  /:::/\:::\    \ ';
+    echo '|:::::::::::::::::|    |/:::/  \:::\   \:::|    |/:::/  \:::\   \:::\____\/::\   \/:::/  \:::\____\';
+    echo '|:::::::::::::::::|____|\::/    \:::\  /:::|____|\::/    \:::\  /:::/    /\:::\  /:::/    \::/    /';
+    echo ' ~~~~~~|::|~~~|~~~       \/_____/\:::\/:::/    /  \/____/ \:::\/:::/    /  \:::\/:::/    / \/____/ ';
+    echo '       |::|   |                   \::::::/    /            \::::::/    /    \::::::/    /          ';
+    echo '       |::|   |                    \::::/    /              \::::/    /      \::::/____/           ';
+    echo '       |::|   |                     \::/____/               /:::/    /        \:::\    \           ';
+    echo '       |::|   |                      ~~                    /:::/    /          \:::\    \          ';
+    echo '       |::|   |                                           /:::/    /            \:::\    \         ';
+    echo '       |::|   |                                          /:::/    /              \:::\____\        ';
+    echo '       |::|___|                                          \::/    /                \::/    /        ';
+    echo '        ~~                                                \/____/                  \/____/         ';
+    echo '                                                                                                   ';
+    echo '###########################################################################################'
+    echo '#                                                                                         #'
+    echo '#                            Script by: maqing@xiaoshiai.cn                               #'
+    echo '#                           © 2024 Chengdu PoXiaoshi Technology Co. Ltd                   #'
+    echo '#                                                                                         #'
+    echo '#           This script is proprietary and confidential. Unauthorized copying,            #'
+    echo '#           distribution, or use of this script is strictly prohibited.                   #'
+    echo '#                                                                                         #'
+    echo '###########################################################################################'
+}
+
+function show_access_info() {
+
+    local LIGHT_BLUE='\033[1;36m'
+    local RED='\033[1;31m'
+    local RED_END='\033[0m'
+    local NORMAL='\033[0m' 
+
+    echo ""
+    echo ""
+    echo -e "  🎉 ${LIGHT_BLUE}Congratulations! XPAI has been successfully deployed! 🎉${NORMAL}"
+    echo -e ""
+    echo -e "  📦 Version: ${LIGHT_BLUE}${mainVersion}-${xpaiVersion}${NORMAL}"
+    echo -e "  🌐 Access Address: ${LIGHT_BLUE}http://console.${baseHost}${NORMAL}"
+    echo -e "  👤 Username: ${LIGHT_BLUE}admin${NORMAL}"
+    echo -e "  🔒 Password: ${LIGHT_BLUE}demo!@#admin${NORMAL}"
+    echo -e""
+    echo -e "  🔑 License: ${LIGHT_BLUE}${license}${NORMAL} ${RED}(Inactive)${RED_END}"
+    echo -e "  📞 Contact: ${LIGHT_BLUE} support@xiaoshiai.cn${NORMAL}"
+    echo -e ""
+    echo -e ""
+
+}
+
+function get_gems_token() {
+  local host=$1
+  local response=$(curl "http://${master}:30000/api/v1/login" \
+    -H "Host: ${host}" \
+    -H 'Accept: application/json, text/plain, */*' \
+    -H 'Content-Type: application/json;charset=UTF-8' \
+    --data-raw '{"username":"admin","password":"demo!@#admin","source":"account"}' \
+    --insecure -s)
+  local token=$(echo $response | grep -o '"token":"[^"]*' | sed 's/"token":"//')
+  echo $token
+}
+
+function get_gems_license() {
+  local host=$1
+  local token=$2
+  local response=$(curl "http://${master}:30000/api/v1/license" \
+    -H "Host: ${host}" \
+    -H "Authorization: Bearer $token" \
+    -H 'Accept: application/json, text/plain, */*' \
+    -H 'X-NoProcess: true' \
+    --insecure -s)
+  echo $(echo $response | grep -o '"cluster":"[^"]*' | sed 's/"cluster":"//')
+}
+
+function add_env_to_root_bashrc() {
+    local var_name=$1    
+    local var_value=$2   
+
+    if [ -z "$var_name" ] || [ -z "$var_value" ]; then
+        return 1
+    fi
+
+    local root_bashrc="/root/.bashrc"
+
+    if [ ! -f "$root_bashrc" ]; then
+        touch "$root_bashrc"
+    fi
+
+    if grep -q "^export $var_name=" "$root_bashrc"; then
+        sed -i "s|^export $var_name=.*|export $var_name=\"$var_value\"|" "$root_bashrc"
+    else
+    fi
 }

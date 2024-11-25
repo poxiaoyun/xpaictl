@@ -21,7 +21,7 @@ spec:
   url: https://charts.kubegems.io/kubegems
   values:
     alertmanager:
-      externalHost: alertmanager.${baseHost}
+      externalHost: alertmanager.${baseHostWithoutPort}
       externalPort: 9093
       maxCpu: 500m
       maxMemory: 256Mi
@@ -29,7 +29,7 @@ spec:
       retention: 168h
       volumeCapacity: 10Gi
     prometheus:
-      externalHost: prometheus.${baseHost}
+      externalHost: prometheus.${baseHostWithoutPort}
       externalPort: 9090
       maxCpu: "4"
       maxMemory: 8Gi

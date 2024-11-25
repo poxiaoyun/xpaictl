@@ -1,11 +1,11 @@
 #!/bin/bash
-set -x
 
 # Get the current path
 script_path=$(realpath "$0")
 script_dir=$(dirname "$script_path")
 
 . ${script_dir}/scripts/utils.sh
+banner 
 check_root
 checkCommand
 
@@ -61,7 +61,6 @@ done
 parse_config "$CONFIG_FILE"
 checkenvs
 
-#Concatenate the IP addresses of the Master node and Worker nodes into a string, separated by commas.
 masters=$(IFS=','; echo "${MASTER_NODES[*]}")
 workers=""
 if [ ${#NODE_NODES[@]} -gt 0 ]; then

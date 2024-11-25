@@ -1,6 +1,4 @@
 function installKubernetes() {
-    local timestamp
-
     # Environment Variables
     export SEALOS_RUNTIME_ROOT=/data/.sealos
     export SEALOS_SCP_CHECKSUM=false
@@ -8,27 +6,43 @@ function installKubernetes() {
     local criDataDir="${defaultDir}/containerd"
     local ebsDataDir="${defaultDir}/openebs/localpv"
     local product="kubernetes"
+    # kernel configurations
+    local MAX_USER_WATCHES_VALUE=2099999999
+    local MAX_USER_INSTANCES_VALUE=2099999999
+    local MAX_QUEUED_EVENTS_VALUE=2099999999
+
+    if [[ "$(declare -p masters 2>/dev/null)" =~ "declare -a" ]]; then
+        local masterss=$(IFS=,; echo "${masters[*]}")
+    else
+        local masterss=${masters}
+    fi
+
+    if [[ "$(declare -p workers 2>/dev/null)" =~ "declare -a" ]]; then
+        local nodes=$(IFS=,; echo "${workers[*]}")
+    else
+        local nodes=${workers}
+    fi
 
     # Log start of installation
     log INFO $product "Starting Kubernetes installation..."
 
     # Install Kubernetes with or without workers
     if [[ -z "$workers" ]]; then
-        log INFO $product "Installing Kubernetes masters: $masters"
+        log INFO $product "Installing Kubernetes masters: $masterss"
         sealos run docker.io/labring/kubernetes:${kubernetesVersion} \
                     docker.io/labring/helm:v3.12.0 \
                     docker.io/labring/calico:3.24.6 \
-                    --masters "$masters" \
+                    --masters "$masterss" \
                     --port ${sshPort:-22} \
                     --passwd ${sshPassword} \
                     -e criData="${criDataDir}"
     else
-        log INFO $product "Installing Kubernetes masters: $masters and workers: $workers"
+        log INFO $product "Installing Kubernetes masters: $masterss and workers: $nodes"
         sealos run docker.io/labring/kubernetes:${kubernetesVersion} \
                     docker.io/labring/helm:v3.12.0 \
                     docker.io/labring/calico:3.24.6 \
-                    --masters "$masters" \
-                    --nodes "$workers" \
+                    --masters "$masterss" \
+                    --nodes "$nodes" \
                     --port ${sshPort:-22} \
                     --passwd ${sshPassword} \
                     -e criData="${criDataDir}"
@@ -55,6 +69,54 @@ function installKubernetes() {
         return 1
     fi
 
-    # Log success
     log INFO $product "Kubernetes and OpenEBS installation completed successfully."
+
+
+    # Excute some command
+    log INFO $product "Optimize system parameters"
+    if [[ $(detect_package_manager) == "apt" ]]; then
+        if sealos exec -c default "systemctl stop unattended-upgrades" > /dev/null 2>&1; then
+            log DEBUG $product "Excute: systemctl stop unattended-upgrades."
+        else
+            log ERROR $product "Excute failed: systemctl stop unattended-upgrades."
+        fi
+
+        if sealos exec -c default "systemctl disable unattended-upgrades" > /dev/null 2>&1; then
+            log DEBUG $product "Excute: systemctl disable unattended-upgrades."
+        else
+            log ERROR $product "Excute failed: systemctl disable unattended-upgrades."
+        fi
+        # hold kernel version
+        if sealos exec -c default "apt-mark hold linux-generic linux-image-generic linux-headers-generic" > /dev/null 2>&1; then
+            log DEBUG $product "Excute: apt-mark hold linux-generic linux-image-generic linux-headers-generic."
+        else
+            log ERROR $product "Excute failed: apt-mark hold linux-generic linux-image-generic linux-headers-generic."
+        fi
+        if sealos exec -c default "apt-mark unhold linux-generic linux-image-generic linux-headers-generic" > /dev/null 2>&1; then
+            log DEBUG $product "Excute: apt-mark unhold linux-generic linux-image-generic linux-headers-generic"
+        else
+            log ERROR $product "Excute failed: apt-mark unhold linux-generic linux-image-generic linux-headers-generic"
+        fi
+    fi
+
+    log INFO $product "Applying runtime kernel configuration."
+    
+    if sealos exec -c default "sysctl -w fs.inotify.max_user_watches=$MAX_USER_WATCHES_VALUE" > /dev/null 2>&1; then
+        log DEBUG $product "Excute: sysctl -w fs.inotify.max_user_watches=$MAX_USER_WATCHES_VALUE"
+    else
+        log ERROR $product "Excute failed: sysctl -w fs.inotify.max_user_watches=$MAX_USER_WATCHES_VALUE"
+    fi
+
+    if sealos exec -c default "sysctl -w fs.inotify.max_user_instances=$MAX_USER_INSTANCES_VALUE"  > /dev/null 2>&1; then
+        log DEBUG $product "Excute: sysctl -w fs.inotify.max_user_watches=$MAX_USER_WATCHES_VALUE"
+    else 
+        log ERROR $product "Excute failed: sysctl -w fs.inotify.max_user_watches=$MAX_USER_WATCHES_VALUE"
+    fi
+
+    if sealos exec -c default "sysctl -w fs.inotify.max_queued_events=$MAX_QUEUED_EVENTS_VALUE"  > /dev/null 2>&1; then
+        log DEBUG $product "Excute: sysctl -w fs.inotify.max_queued_events=$MAX_QUEUED_EVENTS_VALUE"
+    else 
+        log ERROR $product "Excute failed: sysctl -w fs.inotify.max_queued_events=$MAX_QUEUED_EVENTS_VALUE"
+    fi
+
 }

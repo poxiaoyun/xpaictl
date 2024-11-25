@@ -1,11 +1,11 @@
 function installXpai() {
-    local timestamp
     local product="xpai"
     local manifestsDir="${script_dir}/manifests"
     local templatesDir="${script_dir}/artifacts/templates"
-    local template="${templatesDir}/xpai.yaml"
+    local template="xpai.yaml"
+    local manifest=${manifestsDir}/${template}
+    local file
 
-    timestamp=$(get_timestamp)
     if ! command -v kubectl >/dev/null 2>&1; then
         log ERROR $product "The 'kubectl' command is not found. Please check the [modules][kubernetes] runs well."
         exit 1
@@ -18,17 +18,19 @@ function installXpai() {
 
     # Log start of installation
     log INFO $product "Trying to preparing xpai manifests."
+    file=${templatesDir}/${template}
 
-    if [ -e "${template}.template" ]; then
-        if envsubst < ${template}.template > ${template} > /dev/null 2>&1; then
-            log INFO $product "Manifest ${template} is saved in ${manifestsDir}."
+    if [ -e "${file}.template" ]; then
+        if envsubst < ${file}.template > ${manifest}; then
+            log INFO $product "Manifest ${file} is saved in ${manifestsDir}."
         else
-            log ERROR $product "Failed to template ${template}.template."
+            log ERROR $product "Failed to template ${file}.template."
             exit 1
         fi
     else
-        log ERROR $product "Can't find template ${template}.template ."
+        log ERROR $product "Can't find template ${file}.template ."
         exit 1
+    fi
 
 
     cd "${manifestsDir}" || {
@@ -38,16 +40,15 @@ function installXpai() {
 
     log INFO $product "Trying to install xpai."
 
-    if [ -e "${template}" ]; then
-        if  kubectl apply -f --force ${template} > /dev/null 2>&1; then
-            log INFO $product "Manifest ${template} is applied."
+    if [ -e "${manifest}" ]; then
+        if  kubectl apply --force -f ${manifest} > /dev/null 2>&1; then
+            log INFO $product "Manifest ${manifest} is applied."
         else
-            log ERROR $product "Failed to apply ${template}."
+            log ERROR $product "Failed to apply ${manifest}."
             exit 1
         fi
     else
-        log ERROR $product "Can't find manifest ${template}"
+        log ERROR $product "Can't find manifest ${manifest}"
         exit 1
     fi
-fi
 }

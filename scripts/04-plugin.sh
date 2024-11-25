@@ -1,11 +1,10 @@
 function installGems() {
-    local timestamp
+    #set -x 
     local product="plugins"
     local manifestsDir="${script_dir}/manifests"
     local templatesDir="${script_dir}/artifacts/templates"
     local templates=(
         "installer.yaml"
-        "kubernetes.yaml"
         "monitor.yaml"
     )
     local manifests=(
@@ -13,6 +12,7 @@ function installGems() {
         "metrics-server.yaml"
         "prometheus-node-exporter.yaml"
     )
+    export baseHostWithoutPort=${baseHost%%:*}
 
     if ! command -v kubectl >/dev/null 2>&1; then
         log ERROR $product "The 'kubectl' command is not found. Please check the [modules][kubernetes] runs well."
@@ -25,13 +25,20 @@ function installGems() {
         exit 1
     }
 
+    if [ -n "${productSuffix}" ]; then
+		templates+=( "kubegems.suffix.yaml" )
+    else
+        templates+=( "kubegems.yaml" ) 
+	fi
+
     # Log start of installation
-    log INFO $product "Trying to preparing XPAI mainitests."
+    log INFO $product "Trying to preparing XPAI base mainitests."
 
     for template in "${templates[@]}"; do
-        if [ -e "${template}.template" ]; then
+        if [ -e "${templatesDir}/${template}.template" ]; then
             log INFO $product "Templating: ${templatesDir}/${template}.template."
-            if envsubst < ${templatesDir}/${template}.template > ${manifestsDir}/${template} > /dev/null 2>&1; then
+            #if envsubst < "${templatesDir}/${template}.template" > ${manifestsDir}/${template} > /dev/null 2>&1; then
+            if envsubst < "${templatesDir}/${template}.template" > ${manifestsDir}/${template}; then
                 log INFO $product "Manifest file ${template} saved in ${manifestsDir}."
             else
                 log ERROR $product "Failed to template ${templatesDir}/${template}.template ."
@@ -48,7 +55,7 @@ function installGems() {
         exit 1
     }
     # Log start of installation
-    log INFO $product "Trying to install XPAI."
+    log INFO $product "Trying to install XPAI base component."
 
     local files=("${templates[@]}" "${manifests[@]}")
 

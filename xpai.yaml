@@ -6,7 +6,7 @@ mainVersion: 1.24.6
 xpaiVersion: 1.0.8
 
 # 产品后缀,默认为空
-productSuffix: qcloud
+#productSuffix: qcloud
 
 # Kuberntes集群版本，默认离线环境下只支持v1.25.10
 kubernetesVersion: v1.25.10
@@ -15,7 +15,7 @@ kubernetesVersion: v1.25.10
 # 在配置文件 /etc/ssh/sshd_config 中的 `PermitRootLogin yes` 设置
 
 # SSH root账号的登录密码，xpaictl.sh将用这个密码远程登录主机进行安装,确保所有主机的root密码正确
-sshPassword: 123456
+sshPassword: demo!@#admin
 
 # SSH 登录端口，xpaictl.sh将使用$sshPort 端口远程登录主机进行安装,确保所有主机的ssh端口一样
 sshPort: 22 

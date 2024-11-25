@@ -1,8 +1,10 @@
 SHELL := /bin/bash
-MANIFESTS_DIR := ./artifacts
+ARTIFACTS_DIR:= ./artifacts
+MANIFESTS_DIR:= ./manifests
 SEALOS_VERSION := v4.3.7
-SEALOS_VERSION_FILE:= sealos_$$(echo $(SEALOS_VERSION) | sed 's/^v//')_linux_amd64.tar.gz SEALOS_FILE_PATH := $(MANIFESTS_DIR)/$(SEALOS_VERSION_FILE)
-SEALOS_IMAGE_PATH := $(MANIFESTS_DIR)/images
+SEALOS_VERSION_FILE:= sealos_$$(echo $(SEALOS_VERSION) | sed 's/^v//')_linux_amd64.tar.gz 
+SEALOS_FILE_PATH := $(ARTIFACTS_DIR)/$(SEALOS_VERSION_FILE)
+SEALOS_IMAGE_PATH := $(ARTIFACTS_DIR)/images
 HELM_VERSION := v3.12.0
 CALICO_VERSION := 3.24.6
 EBS_VERSION := v3.9.0
@@ -42,11 +44,15 @@ pull:
 	done
 
 save:
-	@source ./scripts/utils.sh; \
+	@set -x ;\
+	 source ./scripts/utils.sh; \
+	 mkdir -p ${SEALOS_IMAGE_PATH}; \
 	 for image in $(IMAGES); do \
 		file=$$(convert_image_to_tar $${image}); \
-		sealos pull $$image; \
-		sealos save -o ${SEALOS_IMAGE_PATH}/$${file} $$image ;\
+		if [ ! -f "${SEALOS_IMAGE_PATH}/$${file}" ]; then \
+			sealos pull $$image; \
+			sealos save -o ${SEALOS_IMAGE_PATH}/$${file} $$image ;\
+		fi ;\
 	done
 
 load:
@@ -58,4 +64,23 @@ load:
 	done
 
 test:
-	@./xpaictl.sh --config xpai.yaml --masters 127.0.0.1
+	@NODE_IP=$$(hostname -I | awk '{print $$1}'); \
+	#./xpaictl.sh --config xpai.yaml --masters $$NODE_IP
+	./xpaictl.sh --config xpai.yaml --masters 172.21.0.4 --nodes 172.21.0.3,172.21.0.2
+
+clean:
+	@rm -rf $(MANIFESTS_DIR)/installer.yaml ;\
+	 rm -rf $(MANIFESTS_DIR)/minio/minio.standalone.values.yaml ;\
+	 rm -rf $(MANIFESTS_DIR)/minio/minio.distributed.values.yaml ;\
+	 rm -rf $(MANIFESTS_DIR)/kubegems.yaml ;\
+	 rm -rf $(MANIFESTS_DIR)/kubegems.suffix.yaml ;\
+	 rm -rf $(MANIFESTS_DIR)/monitor.yaml ;\
+	 rm -rf $(MANIFESTS_DIR)/xpai.yaml ;\
+	 rm -rf $(ARTIFACTS_DIR)/env
+
+clean_all:
+	@$(MAKE) clean 
+	@rm -rf $(ARTIFACTS_DIR)/*.tar.gz
+	@rm -rf $(ARTIFACTS_DIR)/images/*
+	
+
