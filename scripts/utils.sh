@@ -288,11 +288,9 @@ function get_node_count() {
     fi
 
     if [[ -n "$minioReplicas" ]] && [[ "$minioReplicas" =~ ^[0-9]+$ ]]; then
-        timestamp=$(get_timestamp)
         minioNums=$minioReplicas
         log debug $product "Environment variable 'minioReplicas' is set. Using its value: $minioReplicas"
     else
-        timestamp=$(get_timestamp)
         log INFO $product "The largest even number of nodes in the Kubernetes cluster is: ${minioNums},set to 'minioReplicas'"
     fi
 
