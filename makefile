@@ -55,6 +55,11 @@ save:
 		fi ;\
 	done
 
+package:
+	@$(MAKE) sealos
+	@$(MAKE) pull
+	@$(MAKE) save
+
 load:
 	@source ./scripts/utils.sh; \
 	 for image in $(IMAGES); do \
