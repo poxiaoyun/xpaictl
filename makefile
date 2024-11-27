@@ -2,13 +2,21 @@ SHELL := /bin/bash
 ARTIFACTS_DIR:= ./artifacts
 DOWNLOAD_DIR:= ./artifacts
 MANIFESTS_DIR:= ./manifests
+
+HELM_VERSION := v3.12.0
+CALICO_VERSION := 3.24.6
+EBS_VERSION := v3.9.0
+
 SEALOS_VERSION := v4.3.7
 SEALOS_VERSION_FILE:= sealos_$$(echo $(SEALOS_VERSION) | sed 's/^v//')_linux_amd64.tar.gz
 SEALOS_FILE_PATH := $(ARTIFACTS_DIR)/$(SEALOS_VERSION_FILE)
 SEALOS_IMAGE_PATH := $(ARTIFACTS_DIR)/images
-HELM_VERSION := v3.12.0
-CALICO_VERSION := 3.24.6
-EBS_VERSION := v3.9.0
+
+TIDB_VERSION := v7.5.1
+TIDB_FILE := tidb-community-server-$(TIDB_VERSION)-linux-amd64.tar.gz
+TIDB_TOOL_FILE := tidb-community-toolkit-$(TIDB_VERSION)-linux-amd64.tar.gz
+TIDB_FILE_PATH := $(ARTIFACTS_DIR)/$(TIDB_FILE)
+TIDB_TOOL_PATH := $(ARTIFACTS_DIR)/$(TIDB_TOOL_FILE)
 
 
 IMAGES := $(shell bash -c 'source ./scripts/utils.sh && parse_config_nolog xpai.yaml ; \
@@ -28,6 +36,20 @@ IMAGES := $(shell bash -c 'source ./scripts/utils.sh && parse_config_nolog xpai.
         echo $${images[@]}; \
     }; \
     localXpaiImages')
+
+tidb:
+	@if [ ! -f $(TIDB_FILE_PATH) ]; then \
+		echo "File $(TIDB_FILE_PATH) does not exist. Downloading..."; \
+		wget -P $(DOWNLOAD_DIR) https://download.pingcap.org/$(TIDB_FILE); \
+	else \
+		echo "File $(TIDB_FILE_PATH) already exists. Skipping download."; \
+	fi
+	@if [ ! -f $(TIDB_TOOL_PATH) ]; then \
+		echo "File $(TIDB_TOOL_PATH) does not exist. Downloading..."; \
+		wget -P $(DOWNLOAD_DIR) https://download.pingcap.org/$(TIDB_TOOL_FILE); \
+	else \
+		echo "File $(TIDB_FILE_PATH) already exists. Skipping download."; \
+	fi
 
 sealos:
 	@if [ ! -f $(SEALOS_FILE_PATH) ]; then \
@@ -87,3 +109,4 @@ clean_all:
 	@$(MAKE) clean
 	@rm -rf $(ARTIFACTS_DIR)/*.tar.gz
 	@rm -rf $(ARTIFACTS_DIR)/images/*
+	@rm -rf $(ARTIFACTS_DIR)/tidb/*

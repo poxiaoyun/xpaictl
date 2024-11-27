@@ -13,13 +13,17 @@ function installGemsImages() {
     # Log start of installation
     log INFO $product "Installing XPAI images..."
     for image in "${images[@]}"; do
-        log INFO $product "Installing image: $image..."
-        log INFO $product "This process may take a long time, please do not terminate the process."
-        if sealos run "$image" > /dev/null 2>&1; then
-            log INFO $product "Image $image installed successfully."
+        if sealos ps --notruncate |grep ${image} > /dev/null 2>&1; then
+            log INFO $product "Image $image already installed."
         else
-            log ERROR $product "Failed to install image: $image."
-            exit 1
+            log INFO $product "Installing image: $image..."
+            log INFO $product "This process may take a long time, please do not terminate the process."
+            if sealos run "$image" > /dev/null 2>&1; then
+                log INFO $product "Image $image installed successfully."
+            else
+                log ERROR $product "Failed to install image: $image."
+                exit 1
+            fi 
        fi
     done
 

@@ -63,16 +63,44 @@ function main(){
 
     host="console.${baseHost}"
     token=$(get_gems_token ${host})
-    if [[ -z "$token" ]]; then
-      log ERROR main "Failed to retrieve token!"
-      exit 1
-    fi
+    local TIMEOUT=600
 
+    local START_TIME=$(date +%s)
+    while [[ -z "$token" ]]; do
+        log DEBUG main "Attempting to fetch token..."
+        token=$(get_gems_token ${host})
+
+        if [[ -n "$token" ]]; then
+            break
+        fi
+
+        local CURRENT_TIME=$(date +%s)
+        if [[ $((CURRENT_TIME - START_TIME)) -ge $TIMEOUT ]]; then
+            log ERROR main "License fetch operation timed out after 10 minutes."
+            break
+        fi
+
+        sleep 10
+    done
+
+    local START_TIME=$(date +%s)
     cluster=$(get_gems_license ${host} ${token}) 
-    if [[ -z "$cluster" ]]; then
-      log ERROR main "Failed to retrieve cluster!"
-      exit 1
-    fi
+    while [[ -z "$cluster" ]]; do
+        log DEBUG main "Attempting to fetch license..."
+        cluster=$(get_gems_license "${baseHost}" "$token")
+        
+        if [[ -n "$cluster" ]]; then
+            break
+        fi
+
+        local CURRENT_TIME=$(date +%s)
+        if [[ $((CURRENT_TIME - START_TIME)) -ge $TIMEOUT ]]; then
+            log ERROR main "License fetch operation timed out after 10 minutes."
+            break
+        fi
+        sleep 10
+    done
+
     export license=${cluster}
     show_access_info
 
