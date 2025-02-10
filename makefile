@@ -67,7 +67,7 @@ pull:
 	done
 
 save:
-	@source ./scripts/utils.sh; \
+	bash -c 'source ./scripts/utils.sh; \
 	 mkdir -p ${SEALOS_IMAGE_PATH}; \
 	 for image in $(IMAGES); do \
 		file=$$(convert_image_to_tar $${image}); \
@@ -75,7 +75,7 @@ save:
 			sealos pull $$image; \
 			sealos save -o ${SEALOS_IMAGE_PATH}/$${file} $$image ;\
 		fi ;\
-	done
+	done'
 
 package:
 	@$(MAKE) sealos
@@ -83,12 +83,12 @@ package:
 	@$(MAKE) save
 
 load:
-	@source ./scripts/utils.sh; \
+	bash -c 'source ./scripts/utils.sh; \
 	 for image in $(IMAGES); do \
 	 	sealos images rmi $${image}
 		file=$$(convert_image_to_tar $${image}); \
 		sealos load -i ${SEALOS_IMAGE_PATH}/$${file};\
-	done
+	done'
 
 test:
 	@NODE_IP=$$(hostname -I | awk '{print $$1}'); \
