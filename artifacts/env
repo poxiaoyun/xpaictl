@@ -1,0 +1,11 @@
+mainVersion=1.24.6
+xpaiVersion=1.0.8
+kubernetesVersion=v1.25.10
+sshPassword=demo!@#admin
+sshPort=22
+defaultDir=/data
+baseHost=xpai.xiaoshiai.cn:30000
+installNvidiaDriver=false
+enableVgpu=true
+installMinio=true
+minioArchitecture=standalone
