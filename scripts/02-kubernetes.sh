@@ -30,18 +30,18 @@ function installKubernetes() {
     # Install Kubernetes with or without workers
     if [[ -z "$workers" ]]; then
         log INFO $product "Installing Kubernetes masters: $masterss"
-        sealos run docker.io/labring/kubernetes:${kubernetesVersion} \
-                    docker.io/labring/helm:v${helmVersion:-3.12.0} \
-                    docker.io/labring/calico:${calicoVersion:-3.24.6} \
+        sealos run registry.cn-shanghai.aliyuncs.com/labring/kubernetes:${kubernetesVersion} \
+                    registry.cn-shanghai.aliyuncs.com/labring/helm:v${helmVersion:-3.12.0} \
+                    registry.cn-shanghai.aliyuncs.com/labring/calico:${calicoVersion:-3.24.6} \
                     --masters "$masterss" \
                     --port ${sshPort:-22} \
                     --passwd ${sshPassword} \
                     -e criData="${criDataDir}"
     else
         log INFO $product "Installing Kubernetes masters: $masterss and workers: $nodes"
-        sealos run docker.io/labring/kubernetes:${kubernetesVersion} \
-                    docker.io/labring/helm:v${helmVersion:-3.12.0} \
-                    docker.io/labring/calico:${calicoVersion:-3.24.6} \
+        sealos run registry.cn-shanghai.aliyuncs.com/labring/kubernetes:${kubernetesVersion} \
+                    registry.cn-shanghai.aliyuncs.com/labring/helm:v${helmVersion:-3.12.0} \
+                    registry.cn-shanghai.aliyuncs.com/labring/calico:${calicoVersion:-3.24.6} \
                     --masters "$masterss" \
                     --nodes "$nodes" \
                     --port ${sshPort:-22} \
@@ -57,7 +57,7 @@ function installKubernetes() {
 
     # Install OpenEBS
     log INFO $product "Installing OpenEBS with base path: $ebsDataDir"
-    sealos run docker.io/labring/openebs:v${ebsVersion:-3.9.0} \
+    sealos run registry.cn-shanghai.aliyuncs.com/labring/openebs:v${ebsVersion:-3.9.0} \
                 -e HELM_OPTS="--set localprovisioner.basePath=${ebsDataDir} \
                                --set ndm.enabled=false \
                                --set ndmOperator.enabled=false \

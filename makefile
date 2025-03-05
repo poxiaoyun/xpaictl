@@ -23,10 +23,10 @@ IMAGES := $(shell bash -c 'source ./scripts/utils.sh && parse_config_nolog xpai.
     function localXpaiImages() { \
 		source ./artifacts/env ;\
         local images=( \
-			"docker.io/labring/kubernetes:$${kubernetesVersion}" \
-			"docker.io/labring/helm:$(HELM_VERSION)" \
-			"docker.io/labring/calico:$(CALICO_VERSION)" \
-			"docker.io/labring/openebs:$(EBS_VERSION)" \
+			"registry.cn-shanghai.aliyuncs.com/labring/kubernetes:$${kubernetesVersion}" \
+			"registry.cn-shanghai.aliyuncs.com/labring/helm:$(HELM_VERSION)" \
+			"registry.cn-shanghai.aliyuncs.com/labring/calico:$(CALICO_VERSION)" \
+			"registry.cn-shanghai.aliyuncs.com/labring/openebs:$(EBS_VERSION)" \
 			"registry.cn-hangzhou.aliyuncs.com/xiaoshiai/xpai-stack:$${mainVersion}" \
 			"registry.cn-hangzhou.aliyuncs.com/xiaoshiai/xpai-extension:$${mainVersion}" \
         ); \
