@@ -9,6 +9,10 @@ function localXpaiImages() {
     )
     local xpaiImageDir="${script_dir}/artifacts/images"
     local product="images"
+    
+    export SEALOS_RUNTIME_ROOT=${defaultDir}/.sealos
+    export SEALOS_SCP_CHECKSUM=false
+    export SEALOS_DATA_ROOT=${defaultDir}/registry
 
 	if [ -n "${productSuffix}" ]; then
 		images+=( "xpai-stack-${mainVersion}-${productSuffix}.tar" )

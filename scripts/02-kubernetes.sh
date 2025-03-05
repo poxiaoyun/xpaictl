@@ -1,8 +1,9 @@
 function installKubernetes() {
     # Environment Variables
-    export SEALOS_RUNTIME_ROOT=/data/.sealos
+    export SEALOS_RUNTIME_ROOT=${defaultDir}/.sealos
     export SEALOS_SCP_CHECKSUM=false
     export SEALOS_DATA_ROOT=${defaultDir}/registry
+    
     local criDataDir="${defaultDir}/containerd"
     local ebsDataDir="${defaultDir}/openebs/localpv"
     local product="kubernetes"

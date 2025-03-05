@@ -1,4 +1,8 @@
 function installGemsImages() {
+    export SEALOS_RUNTIME_ROOT=${defaultDir}/.sealos
+    export SEALOS_SCP_CHECKSUM=false
+    export SEALOS_DATA_ROOT=${defaultDir}/registry
+    
     local timestamp
     local product="gems"
     local images=(
