@@ -470,7 +470,8 @@ function show_access_info() {
     echo -e "  🔒 Password: ${LIGHT_BLUE}demo!@#admin${NORMAL}"
     echo -e""
     echo -e "  🔑 ProductID: ${LIGHT_BLUE}${license}${NORMAL} ${RED}(Inactive)${RED_END}"
-    echo -e "  📞 Contact: ${LIGHT_BLUE} support@xiaoshiai.cn${NORMAL}",Please contact us for license.
+    echo -e "  📞 Contact: ${LIGHT_BLUE} support@xiaoshiai.cn${NORMAL}"
+    echo -e "              Please contact us for license."
     echo -e ""
     echo -e ""
 

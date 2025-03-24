@@ -129,7 +129,7 @@ function installKubernetes() {
             log ERROR $product "$cacheDev format failed."
         fi
 
-        mkdir -p $cacheDir
+        mkdir -p $CacheDir
         if sealos exec -c default "mount -o allocsize=1g,noatime,nodiratime $cacheDev $cacheDir"  > /dev/null 2>&1; then
             log INFO $product "$cacheDev has been mounted to $cacheDir."
         else
