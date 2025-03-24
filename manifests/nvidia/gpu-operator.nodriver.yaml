@@ -36,4 +36,10 @@ spec:
         value: "true" 
       - name: ACCEPT_NVIDIA_VISIBLE_DEVICES_ENVVAR_WHEN_UNPRIVILEGED
         value: "false"
+    #550驱动校验报错，需增加下面报错
+    validator:
+      driver:
+        env:
+        - name: DISABLE_DEV_CHAR_SYMLINK_CREATION
+          value: "true"
 
