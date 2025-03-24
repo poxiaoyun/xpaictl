@@ -469,8 +469,8 @@ function show_access_info() {
     echo -e "  👤 Username: ${LIGHT_BLUE}admin${NORMAL}"
     echo -e "  🔒 Password: ${LIGHT_BLUE}demo!@#admin${NORMAL}"
     echo -e""
-    echo -e "  🔑 License: ${LIGHT_BLUE}${license}${NORMAL} ${RED}(Inactive)${RED_END}"
-    echo -e "  📞 Contact: ${LIGHT_BLUE} support@xiaoshiai.cn${NORMAL}"
+    echo -e "  🔑 ProductID: ${LIGHT_BLUE}${license}${NORMAL} ${RED}(Inactive)${RED_END}"
+    echo -e "  📞 Contact: ${LIGHT_BLUE} support@xiaoshiai.cn${NORMAL}",Please contact us for license.
     echo -e ""
     echo -e ""
 

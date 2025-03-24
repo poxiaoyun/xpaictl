@@ -121,13 +121,15 @@ function installKubernetes() {
         log ERROR $product "Excute failed: sysctl -w fs.inotify.max_queued_events=$MAX_QUEUED_EVENTS_VALUE"
     fi
 
-     if ${cache}; then
-        log INFO $product "IMPORTANR!! XPAI Cache has enabled, The device ${cacheDev} is about to be format!'
+    if ${cache}; then
+        log INFO $product "IMPORTANR!! XPAI Cache has enabled, The device ${cacheDev} is about to be format!"
         if sealos exec -c default "mkfs.xfs -f $cacheDev"  > /dev/null 2>&1; then
             log INFO $product "$cacheDev has been successfully format as xfs filesystem."
         else
             log ERROR $product "$cacheDev format failed."
+        fi
 
+        mkdir -p $cacheDir
         if sealos exec -c default "mount -o allocsize=1g,noatime,nodiratime $cacheDev $cacheDir"  > /dev/null 2>&1; then
             log INFO $product "$cacheDev has been mounted to $cacheDir."
         else
