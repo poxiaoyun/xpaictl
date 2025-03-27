@@ -15,12 +15,8 @@ spec:
   values:
     api:
       enabled: true
-      image:
-        tag: v${xpaiVersion}
     controller:
       enabled: true
-      image:
-        tag: v${xpaiVersion}
       ingress:
         baseHost: ${baseHost}
         className: default-gateway
@@ -37,8 +33,6 @@ spec:
           enabled: ${enableVgpu}
     node:
       enabled: true
-      image:
-        tag: v${xpaiVersion}
   valuesFrom:
   - kind: ConfigMap
     name: kubegems-global-values
