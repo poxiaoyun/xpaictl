@@ -11,7 +11,7 @@ function installKubernetes() {
     local MAX_USER_WATCHES_VALUE=2099999999
     local MAX_USER_INSTANCES_VALUE=2099999999
     local MAX_QUEUED_EVENTS_VALUE=2099999999
-    local CacheDir=${cacheDir:/var/jfsCache}
+    local CacheDir=${cacheDir:-/var/jfsCache}
 
     if [[ "$(declare -p masters 2>/dev/null)" =~ "declare -a" ]]; then
         local masterss=$(IFS=,; echo "${masters[*]}")
@@ -129,11 +129,11 @@ function installKubernetes() {
             log ERROR $product "$cacheDev format failed."
         fi
 
-        mkdir -p $CacheDir
-        if sealos exec -c default "mount -o allocsize=1g,noatime,nodiratime $cacheDev $cacheDir"  > /dev/null 2>&1; then
-            log INFO $product "$cacheDev has been mounted to $cacheDir."
+        mkdir -p ${CacheDir}
+        if sealos exec -c default "mount -o allocsize=1g,noatime,nodiratime ${cacheDev} ${CacheDir}"  > /dev/null 2>&1; then
+            log INFO $product "${cacheDev} has been mounted to ${CacheDir}."
         else
-            log ERROR $product "$cacheDev."
+            log ERROR $product "${cacheDev} mounted failed."
         fi
     fi
 
