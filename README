@@ -32,6 +32,7 @@ make package
 
 讲本工程（包含离线镜像）拷贝到目标节点
 
+
 1. 配置文件 `xpai.yaml`
 
 配置说明参考文件内说明
@@ -72,3 +73,22 @@ make package
 部署完成后会输出如下信息，此时需要拿着license信息获取授权激活
 
 ![alt text](image.png)
+
+
+### 遗留问题：
+
+1. 缓存盘没有写入到/etc/fstab 中，需要手动配置
+
+```
+# 样例,所有节点都需要配置
+/dev/sda /var/jfsCache/ xfs defaults 0 0
+```
+
+2. 内核的参数没有持久化到/etc/sysctl.conf中，需手动配置
+
+```
+# 样例,所有节点都需要配置
+fs.inotify.max_user_watches=2099999999
+fs.inotify.max_user_instances=2099999999
+fs.inotify.max_queued_events=2099999999
+```
