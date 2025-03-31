@@ -74,6 +74,10 @@ make package
 
 ![alt text](image.png)
 
+### 卸载XPAj
+
+执行命令`sealos reset` 即可将环境重置
+
 
 ### 遗留问题：
 

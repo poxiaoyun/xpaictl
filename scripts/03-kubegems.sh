@@ -7,7 +7,6 @@ function installGemsImages() {
     local product="gems"
     local images=(
         "registry.cn-hangzhou.aliyuncs.com/xiaoshiai/xpai-stack:${mainVersion}"
-        "registry.cn-hangzhou.aliyuncs.com/xiaoshiai/xpai-extension:${mainVersion}"
     )
 
 	if [ -n "${productSuffix}" ]; then

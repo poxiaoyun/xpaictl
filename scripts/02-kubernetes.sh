@@ -133,7 +133,7 @@ function installKubernetes() {
         if sealos exec -c default "mount -o allocsize=1g,noatime,nodiratime ${cacheDev} ${CacheDir}"  > /dev/null 2>&1; then
             log INFO $product "${cacheDev} has been mounted to ${CacheDir}."
         else
-            log ERROR $product "${cacheDev} mounted failed."
+            log ERROR $product "${CacheDir} mounted failed."
         fi
     fi
 

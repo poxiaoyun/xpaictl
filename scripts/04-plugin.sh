@@ -11,6 +11,7 @@ function installGems() {
         "gateway.yaml"
         "metrics-server.yaml"
         "prometheus-node-exporter.yaml"
+        "vllm.sm.yaml"
     )
     export baseHostWithoutPort=${baseHost%%:*}
 

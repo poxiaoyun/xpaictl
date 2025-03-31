@@ -1,12 +1,18 @@
 ###############################  Global Setting ################################################
 # 产品主版本，一般默认不需要修改
-mainVersion: 1.24.6
+mainVersion: 1.24.7
 
 # 智算平台XPAI版本
-xpaiVersion: 1.0.8
+xpaiVersion: 1.0.9
 
-# 产品后缀,默认为空
+# 产品后缀,默认为空。此配置为OEM厂家配置，安装前需确定目标客户是否为OEM版本
 # productSuffix: qcloud
+
+# 安装扩展镜像包，包含XPAI平台内置的训练、推理框架镜像和平台tookit辅助镜像
+# 由于扩展镜像包很大，约60GB，目标机器如果磁盘性能一般会导致安装时间很长
+# 通常如果您的目标主机能够访问互联网，可以关闭扩展镜像包的安装，由平台第一次调度任务时从互联网上下载
+# 如果您的环境是离线或者不能访问互联网，请务必打开扩展镜像包
+xpaiExtension: false
 
 # Kuberntes集群版本，默认离线环境下只支持v1.25.10
 kubernetesVersion: v1.25.10
@@ -24,15 +30,18 @@ kubernetesVersion: v1.25.10
 # 在配置文件 /etc/ssh/sshd_config 中的 `PermitRootLogin yes` 设置
 
 # SSH root账号的登录密码，xpaictl.sh将用这个密码远程登录主机进行安装,确保所有主机的root密码正确
-sshPassword: demo!@#admin
+#sshPassword: demo!@#admin
+sshPassword: <target_ssh_paassword>
 
 # SSH 登录端口，xpaictl.sh将使用$sshPort 端口远程登录主机进行安装,确保所有主机的ssh端口一样
-sshPort: 22 
+#sshPort: 22
+sshPort: <target_ssh_port>
 
-############################### Default Persistent data ####################################
+############################### 默认数据和安装路径配置 ####################################
 
 # XPAI集群所有节点默认的数据存放路径
-defaultDir: /data
+#defaultDir: /data
+defaultDir: <target_data_path>
 
 # XPAI 数据缓存配置，默认关闭,设置成 true 打开数据缓存功能，需指定缓存硬盘
 cache: false
@@ -40,7 +49,8 @@ cache: false
 # !!! 注意数据!!!
 # cache 启用后，缓存硬盘设备在安装过程中会被格式化，请注意数据备份
 # 当前仅支持一块硬盘设备，如果有多块硬盘可提前做好 raid 
-cacheDev: /dev/sdb
+#cacheDev: /dev/sdb
+cacheDev: <target_device>
 # TODO: 仅支持一次性挂载到/var/jfsCache目录，重启后失效，需持久化配置
 
 ############################### Host ######################################################
@@ -55,7 +65,8 @@ cacheDev: /dev/sdb
 # 提示： 环境默认端口是30000，对应的是默认的`default-gateway`网关,要修改端口成80或433端口
 # 第一步先将baseHost的端口删除正常部署，第二步在平台部署完成后手动将网关对应的网络设置成`hostNetwork`
 
-baseHost: xpai.xiaoshiai.cn:30000
+#baseHost: xpai.xiaoshiai.cn:30000
+baseHost: <your_domain_name>[:<target_port>]
 
 ############################### Nvidia Driver Config #######################################
 #

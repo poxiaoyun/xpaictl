@@ -28,7 +28,6 @@ IMAGES := $(shell bash -c 'source ./scripts/utils.sh && parse_config_nolog xpai.
 			"registry.cn-shanghai.aliyuncs.com/labring/calico:$(CALICO_VERSION)" \
 			"registry.cn-shanghai.aliyuncs.com/labring/openebs:$(EBS_VERSION)" \
 			"registry.cn-hangzhou.aliyuncs.com/xiaoshiai/xpai-stack:$${mainVersion}" \
-			"registry.cn-hangzhou.aliyuncs.com/xiaoshiai/xpai-extension:$${mainVersion}" \
         ); \
 		if [ -n "$${productSuffix}" ]; then \
 			images+=( "registry.cn-hangzhou.aliyuncs.com/xiaoshiai/xpai-stack:$${mainVersion}-$${productSuffix}" ); \
@@ -36,6 +35,16 @@ IMAGES := $(shell bash -c 'source ./scripts/utils.sh && parse_config_nolog xpai.
         echo $${images[@]}; \
     }; \
     localXpaiImages')
+
+EXTENSION_IMAGES := $(shell bash -c 'source ./scripts/utils.sh && parse_config_nolog xpai.yaml ; \
+    function localXpaiExtensionImages() { \
+		source ./artifacts/env ;\
+        local images=( \
+			"registry.cn-hangzhou.aliyuncs.com/xiaoshiai/xpai-extension:$${mainVersion}" \
+        ); \
+        echo $${images[@]}; \
+    }; \
+    localXpaiExtensionImages')
 
 tidb:
 	@if [ ! -f $(TIDB_FILE_PATH) ]; then \
@@ -54,7 +63,7 @@ tidb:
 sealos:
 	@if [ ! -f $(SEALOS_FILE_PATH) ]; then \
 		echo "File $(SEALOS_FILE_PATH) does not exist. Downloading..."; \
-		wget -P $(DOWNLOAD_DIR) https://mirror.ghproxy.com/https://github.com/labring/sealos/releases/download/${SEALOS_VERSION}/$(SEALOS_VERSION_FILE); \
+		wget -P $(DOWNLOAD_DIR) https://github.com/labring/sealos/releases/download/${SEALOS_VERSION}/$(SEALOS_VERSION_FILE); \
 	else \
 		echo "File $(SEALOS_FILE_PATH) already exists. Skipping download."; \
 	fi
@@ -62,6 +71,12 @@ sealos:
 
 pull:
 	@for image in $(IMAGES); do \
+		echo "Pulling $$image"; \
+		sealos pull $$image; \
+	done
+
+pull-extension:
+	@for image in $(EXTENSION_IMAGES); do \
 		echo "Pulling $$image"; \
 		sealos pull $$image; \
 	done
@@ -77,10 +92,27 @@ save:
 		fi ;\
 	done'
 
+save-extension:
+	bash -c 'source ./scripts/utils.sh; \
+	 mkdir -p ${SEALOS_IMAGE_PATH}; \
+	 for image in $(EXTENSION_IMAGES); do \
+		file=$$(convert_image_to_tar $${image}); \
+		if [ ! -f "${SEALOS_IMAGE_PATH}/$${file}" ]; then \
+			sealos pull $$image; \
+			sealos save -o ${SEALOS_IMAGE_PATH}/$${file} $$image ;\
+		fi ;\
+	done'
+
+
 package:
 	@$(MAKE) sealos
 	@$(MAKE) pull
 	@$(MAKE) save
+
+package-extension:
+	@$(MAKE) pull-extension
+	@$(MAKE) save-extension
+
 
 load:
 	bash -c 'source ./scripts/utils.sh; \

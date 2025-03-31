@@ -462,7 +462,9 @@ function show_access_info() {
 
     echo ""
     echo ""
-    echo -e "  🎉 ${LIGHT_BLUE}Congratulations! XPAI has been successfully deployed! 🎉${NORMAL}"
+    echo -e "  ${BOLD}${LIGHT_BLUE}╔════════════════════════════════════════════════════════════════╗${NORMAL}"
+    echo -e "  ${BOLD}${LIGHT_BLUE}║${NORMAL}   🎉 ${GREEN}Congratulations! XPAI has been successfully deployed!${NORMAL} 🎉  ${BOLD}${LIGHT_BLUE}║${NORMAL}"
+    echo -e "  ${BOLD}${LIGHT_BLUE}╚════════════════════════════════════════════════════════════════╝${NORMAL}"
     echo -e ""
     echo -e "  📦 Version: ${LIGHT_BLUE}${mainVersion}-${xpaiVersion}${NORMAL}"
     echo -e "  🌐 Access Address: ${LIGHT_BLUE}http://console.${baseHost}${NORMAL}"
@@ -470,9 +472,15 @@ function show_access_info() {
     echo -e "  🔒 Password: ${LIGHT_BLUE}demo!@#admin${NORMAL}"
     echo -e""
     echo -e "  🔑 ProductID: ${LIGHT_BLUE}${license}${NORMAL} ${RED}(Inactive)${RED_END}"
-    echo -e "  📞 Contact: ${LIGHT_BLUE} support@xiaoshiai.cn${NORMAL}"
-    echo -e "              Please contact us for license."
+    echo -e "  ⚠️ Please obtain software license through the following contact information."
     echo -e ""
+    echo -e "  ✉️ Support: ${LIGHT_BLUE} support@xiaoshiai.cn${NORMAL}"
+    echo -e "  🌐 WebSite: ${LIGHT_BLUE} https://www.xiaoshiai.cn${NORMAL}"
+    echo -e ""
+    echo -e "  ╔═══════════════════════════════════════════════════════╗"
+    echo -e "  ║  © 2023-$(date +%Y) 成都破晓石科技有限公司 版权所有          ║"
+    echo -e "  ║  ℗ All Rights Reserved                                ║"
+    echo -e "  ╚═══════════════════════════════════════════════════════╝"
     echo -e ""
 
 }

@@ -103,5 +103,9 @@ function main(){
 
     export license=${cluster}
     show_access_info
-
+    if [[ "${xpaiExtension}" == "true" ]];then 
+        log INFO $product "XPAI Extension Package is enabled, The script will continue to install extensions."
+        log INFO $product "This usually takes a long time to install the extension package, but it does not affect your access to the platform."
+        installXpaiExtension
+    fi
 }
