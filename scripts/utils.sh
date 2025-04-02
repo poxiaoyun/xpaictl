@@ -35,16 +35,21 @@ function log() {
 # Display help INFOrmation
 function usage() {
     echo ""
-    echo "Usage: $0 --config xpai.yaml --masters <master_ip1,master_ip2,...> --nodes <node_ip1,node_ip2,...>"
+    echo "Usage: $0 --config xpai.yaml --masters <master_ip1,master_ip2,...> --nodes <node_ip1,node_ip2,...> <--offline>"
     echo ""
     echo "Examples:"
     echo ""
-    echo "create a HA cluster to your baremetal server, appoint the iplist:"
+    echo "Create a HA cluster to your baremetal server in an internet environment, appoint the iplist:"
     echo "         xpaictl.sh --config xpai.yaml --masters 192.168.0.1,192.168.0.2,192.168.0.3 --nodes 192.168.0.4,192.168.0.5,192.168.0.6"
     echo ""
-    echo "create a single master cluster to your baremetal server, appoint the iplist:"
+    echo "Create a single master cluster to your baremetal server in an internet environment, appoint the iplist:"
     echo "         xpaictl.sh --config xpai.yaml --masters 192.168.0.1 --nodes 192.168.0.2,192.168.0.3,192.168.0.4"
     echo ""
+    echo "Create a single node to your bare metal node in an internet environment"
+    echo "         xpaictl.sh --config xpai.yaml --masters 192.168.0.1"
+    echo ""
+    echo "Create a single node to your baremetal server in an offline enviroment, appoint the iplist:"
+    echo "         xpaictl.sh --config xpai.yaml --masters 192.168.0.1 --offline"
     exit 1
 }
 

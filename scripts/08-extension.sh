@@ -18,27 +18,27 @@ function installXpaiExtension() {
         exit 1
     }
 
-    # Load each image
-    log INFO $product "Trying to load images from ${xpaiImageDir}."
-    log INFO $product "This process may take a long time, please do not terminate the process."
+    if ${offline}; then
+        # Load extension image
+        log INFO $product "Trying to load images from ${xpaiImageDir}."
+        log INFO $product "This process may take a long time, please do not terminate the process."
 
-    for image in "${files[@]}"; do
-        if [ -e "${image}" ]; then
-            log INFO $product "Loading image: ${xpaiImageDir}/${image}."
-            if sealos load -i "${xpaiImageDir}/${image}" > /dev/null 2>&1; then
-                log INFO $product "${xpaiImageDir}/${image} loaded successfully."
+        for image in "${files[@]}"; do
+            if [ -e "${image}" ]; then
+                log INFO $product "Loading image: ${xpaiImageDir}/${image}."
+                if sealos load -i "${xpaiImageDir}/${image}" > /dev/null 2>&1; then
+                    log INFO $product "${xpaiImageDir}/${image} loaded successfully."
+                else
+                    log ERROR $product "Failed to load image: ${xpaiImageDir}/${image}."
+                    exit 1
+                fi
             else
-                log ERROR $product "Failed to load image: ${xpaiImageDir}/${image}."
+                log ERROR $product "Can't find file ${xpaiImageDir}/${image} ."
                 exit 1
             fi
-        else
-            log ERROR $product "Can't find file ${xpaiImageDir}/${image} ."
-            exit 1
-        fi
-    done
-
-    log INFO $product "All images loaded successfully." 
-
+        done
+        log INFO $product "All images loaded successfully." 
+    fi
 
     # Log start of installation
     log INFO $product "Installing XPAI extension images..."

@@ -24,7 +24,10 @@ function main(){
     done
 
     initSealos
-    localXpaiImages
+    # 如果安装参数携带 --offline，则跳过本地镜像导入，直接从镜像仓库下载XPAI
+    if ${offline}; then
+        localXpaiImages
+    fi
     installKubernetes
     wait_for_nodes_ready
     installGemsImages
@@ -103,6 +106,7 @@ function main(){
 
     export license=${cluster}
     show_access_info
+    
     if [[ "${xpaiExtension}" == "true" ]];then 
         log INFO $product "XPAI Extension Package is enabled, The script will continue to install extensions."
         log INFO $product "This usually takes a long time to install the extension package, but it does not affect your access to the platform."

@@ -13,6 +13,9 @@ MASTER_NODES=()
 NODE_NODES=()
 CONFIG_FILE=""
 
+# 默认在线安装
+OFFLINE=false
+
 
 # Parameter Parsing
 while [[ "$#" -gt 0 ]]; do
@@ -28,6 +31,10 @@ while [[ "$#" -gt 0 ]]; do
         --config)
             CONFIG_FILE="$2"
             shift 2
+            ;;
+        --offline)
+            OFFLINE=true
+            shift
             ;;
         *)
             echo "Unknown parameter passed: $1"
@@ -56,6 +63,13 @@ for master in "${MASTER_NODES[@]}"; do
         exit 1
     fi
 done
+
+export offline=$OFFLINE
+if $offline; then
+    log DEBUG Deploy "XPAI will be deployed in offline mode."
+else
+    log DEBUG Deploy "XPAI will be deployed in online mode."
+fi
 
 # Parse the configuration file and convert the content into global environment variables
 parse_config "$CONFIG_FILE"
