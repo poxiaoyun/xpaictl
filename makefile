@@ -7,6 +7,8 @@ HELM_VERSION := v3.12.0
 CALICO_VERSION := 3.24.6
 EBS_VERSION := v3.9.0
 
+#GITHUB_PROXY := https://ghfast.top
+
 SEALOS_VERSION := v4.3.7
 SEALOS_VERSION_FILE:= sealos_$$(echo $(SEALOS_VERSION) | sed 's/^v//')_linux_amd64.tar.gz
 SEALOS_FILE_PATH := $(ARTIFACTS_DIR)/$(SEALOS_VERSION_FILE)
@@ -63,7 +65,11 @@ tidb:
 sealos:
 	@if [ ! -f $(SEALOS_FILE_PATH) ]; then \
 		echo "File $(SEALOS_FILE_PATH) does not exist. Downloading..."; \
-		wget -P $(DOWNLOAD_DIR) https://github.com/labring/sealos/releases/download/${SEALOS_VERSION}/$(SEALOS_VERSION_FILE); \
+		if [ -n "$(GITHUB_PROXY)" ]; then \
+			wget -P $(DOWNLOAD_DIR) $(GITHUB_PROXY)/https://github.com/labring/sealos/releases/download/$(SEALOS_VERSION)/$(SEALOS_VERSION_FILE); \
+		else \
+			wget -P $(DOWNLOAD_DIR) https://github.com/labring/sealos/releases/download/$(SEALOS_VERSION)/$(SEALOS_VERSION_FILE); \
+		fi; \
 	else \
 		echo "File $(SEALOS_FILE_PATH) already exists. Skipping download."; \
 	fi

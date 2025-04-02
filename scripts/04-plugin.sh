@@ -11,8 +11,12 @@ function installGems() {
         "gateway.yaml"
         "metrics-server.yaml"
         "prometheus-node-exporter.yaml"
+    )
+
+    local serviceMonitor=(
         "vllm.sm.yaml"
     )
+
     export baseHostWithoutPort=${baseHost%%:*}
 
     if ! command -v kubectl >/dev/null 2>&1; then
@@ -74,5 +78,21 @@ function installGems() {
             exit 1
         fi
     done
-    
+
+    # 需要等prometheus-operator提交crd后，这里的servicemonitor才能正常提交
+    wait_until_running deployment kube-prometheus-stack-operator kubegems-monitoring 500
+    for file in "${serviceMonitor}";do 
+        if [ -e "${file}" ]; then
+            if kubectl apply --force -f ${file} > /dev/null 2>&1; then
+                log INFO $product "Manifest file ${manifestsDir}/${file} is applied." 
+            else
+                log ERROR $product "Failed to apply ${manifestsDir}/${file}."
+                exit 1
+            fi
+        else
+            log ERROR $product "Can't find manifest ${manifestsDir}/${file}."
+            exit 1
+        fi
+    done
+
 }
