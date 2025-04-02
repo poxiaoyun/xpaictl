@@ -80,6 +80,12 @@ function installGems() {
     done
 
     # 需要等prometheus-operator提交crd后，这里的servicemonitor才能正常提交
+    if ! namespace_exists kubegems-pai; then
+        if  kubectl create ns kubegems-pai > /dev/null 2>&1; then
+            log INFO $product "Create namespace/kubegems-pai successfully."
+        fi
+    fi
+
     wait_until_running deployment kube-prometheus-stack-operator kubegems-monitoring 500
     for file in "${serviceMonitor}";do 
         if [ -e "${file}" ]; then

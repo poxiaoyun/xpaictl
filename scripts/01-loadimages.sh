@@ -18,6 +18,11 @@ function localXpaiImages() {
 	fi
 
     # Change directory to the artifacts folder
+    if [ ! -d "${xpaiImageDir}" ]; then
+        log ERROR $product "Directory ${xpaiImageDir} does not exist."
+        exit 1
+    fi
+
     cd "${xpaiImageDir}" || {
         log ERROR $product "Failed to change directory to ${xpaiImageDir}."
         exit 1
@@ -38,6 +43,8 @@ function localXpaiImages() {
             fi
         else
             log ERROR $product "Can't find file ${xpaiImageDir}/${image} ."
+            log ERROR $product "Please run 'make package' to generate the image."
+            log ERROR $product "If you have already run 'make package', please check the file name.The file name should be: ${image}"
             exit 1
         fi
     done

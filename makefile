@@ -7,6 +7,7 @@ HELM_VERSION := v3.12.0
 CALICO_VERSION := 3.24.6
 EBS_VERSION := v3.9.0
 
+#由于国内网络的特殊原因，访问 GitHub 可能会受限,需要加速请使用代理
 #GITHUB_PROXY := https://ghfast.top
 
 SEALOS_VERSION := v4.3.7
