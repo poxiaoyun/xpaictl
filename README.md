@@ -12,7 +12,7 @@
 
 在构建离线镜像包之前，确认部署xpai的版本是晓石还是厂家OEM版本。如果是OEM版本，请在xpai.yaml配置文件中修改如下内容
 
-```
+```yaml
 productSuffix: <厂家名称>
 # 例如： 云易捷版本配置
 # productSuffix: qcloud
@@ -20,8 +20,17 @@ productSuffix: <厂家名称>
 
 2. 执行构建镜像
 
-```
+镜像分为 stack 和 extension 两个离线包。
+
+- stack 包含整个 xpai 平台 运行所需要的镜像
+- extension 包含 xpai 平台内建模、推理和训练框架镜像
+
+```bash
+#构建stack包
 make package
+
+#构建extension包
+make package-extension
 ```
 
 执行完成后，离线镜像会保存在 `artifacts/images`目录下，此时将本工程整体拷贝到被安装机器上开始安装
@@ -41,8 +50,11 @@ make package
 
 > NOTES： 根据xpai.yaml 内的ssh配置，确保集群内所有主机的ssh端口、root密码一致
 
+3. 显卡驱动
 
-##### 部署样例：
+默认不安装显卡驱动，由于离线环境显卡驱动和版本要求都比较难以控制，所以安装过程不含驱动的安装。这部分需要用户在目标主机上自行安装GPU驱动。
+
+##### 在线部署样例：
 
 - 部署单节点(172.16.1.1)的XPAI平台
 
@@ -56,17 +68,25 @@ make package
 ./xpaictl.sh --config xpai.yaml --masters 172.16.1.1 --nodes 172.16.1.2,172.16.1.3,172.16.1.4
 ```
 
-
 - 部署单3master(172.16.1.1,172.16.1.2,172.16.1.3),3计算节点（172.16.1.4,172.16.1.5,172.16.1.6）的XPAI平台
 
 ```bash
 ./xpaictl.sh --config xpai.yaml --masters 172.16.1.1,172.16.1.2,172.16.1.3 --nodes 172.16.1.4,172.16.1.5,172.16.1.6
 ```
 
-3. 显卡驱动
+##### 离线部署样例
 
-默认不安装显卡驱动，由于离线环境显卡驱动和版本要求都比较难以控制，所以安装过程不含驱动的安装。这部分需要用户在目标主机上自行安装GPU驱动。
+- 离线部署单节点(172.16.1.1)的XPAI平台
 
+```bash
+./xpaictl.sh --config xpai.yaml --masters 172.16.1.1 --offline
+```
+
+- 离线部署单3master(172.16.1.1,172.16.1.2,172.16.1.3),3计算节点（172.16.1.4,172.16.1.5,172.16.1.6）的XPAI平台
+
+```bash
+./xpaictl.sh --config xpai.yaml --masters 172.16.1.1,172.16.1.2,172.16.1.3 --nodes 172.16.1.4,172.16.1.5,172.16.1.6 --offline
+```
 
 ### 激活
 
@@ -74,7 +94,7 @@ make package
 
 ![alt text](image.png)
 
-### 卸载XPAj
+### 卸载XPAI
 
 执行命令`sealos reset` 即可将环境重置
 
