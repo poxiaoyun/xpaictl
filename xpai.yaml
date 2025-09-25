@@ -1,9 +1,9 @@
 ###############################  Global Setting ################################################
 # 产品主版本，一般默认不需要修改
-mainVersion: 1.24.7
+mainVersion: 1.24.9
 
 # 智算平台XPAI版本
-xpaiVersion: 1.0.9
+xpaiVersion: 1.0.12
 
 # 产品后缀,默认为空。此配置为OEM厂家配置，安装前需确定目标客户是否为OEM版本
 # productSuffix: qcloud
