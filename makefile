@@ -2,6 +2,7 @@ SHELL := /bin/bash
 ARTIFACTS_DIR:= ./artifacts
 DOWNLOAD_DIR:= ./artifacts
 MANIFESTS_DIR:= ./manifests
+ARCH := $(shell uname -m |sed 's/x86_64/amd64/;s/aarch64/arm64/')
 
 HELM_VERSION := v3.12.0
 CALICO_VERSION := 3.24.6
@@ -10,8 +11,16 @@ EBS_VERSION := v3.9.0
 #由于国内网络的特殊原因，访问 GitHub 可能会受限,需要加速请使用代理
 #GITHUB_PROXY := https://ghfast.top
 
+NERDCTL_VERSION := 2.1.4
+NERDCTL_VERSION_FILE := nerdctl-$(NERDCTL_VERSION)-linux-$(ARCH).tar.gz
+NERDCTL_FILE_PATH := $(ARTIFACTS_DIR)/$(NERDCTL_VERSION_FILE)
+
+BUILDKIT_VERSION := v0.24.0
+BUILDKIT_VERSION_FILE := buildkit-$(BUILDKIT_VERSION).linux-$(ARCH).tar.gz
+BUILDKIT_VERSION_PATH := $(ARTIFACTS_DIR)/$(BUILDKIT_VERSION_FILE)
+
 SEALOS_VERSION := v4.3.7
-SEALOS_VERSION_FILE:= sealos_$$(echo $(SEALOS_VERSION) | sed 's/^v//')_linux_amd64.tar.gz
+SEALOS_VERSION_FILE:= sealos_$$(echo $(SEALOS_VERSION) | sed 's/^v//')_linux_${ARCH}.tar.gz
 SEALOS_FILE_PATH := $(ARTIFACTS_DIR)/$(SEALOS_VERSION_FILE)
 SEALOS_IMAGE_PATH := $(ARTIFACTS_DIR)/images
 
@@ -75,6 +84,30 @@ sealos:
 		echo "File $(SEALOS_FILE_PATH) already exists. Skipping download."; \
 	fi
 	@tar zxvf $(SEALOS_FILE_PATH) sealos && chmod +x sealos && mv sealos /usr/bin
+
+nerdctl:
+	@if [ ! -f $(NERDCTL_FILE_PATH) ]; then \
+		echo "File $(NERDCTL_FILE_PATH) does not exist. Downloading..."; \
+		if [ -n "$(GITHUB_PROXY)" ]; then \
+			wget -P $(DOWNLOAD_DIR) $(GITHUB_PROXY)/https://github.com/containerd/nerdctl/releases/download/v$(NERDCTL_VERSION)/$(NERDCTL_VERSION_FILE); \
+		else \
+			wget -P $(DOWNLOAD_DIR)	https://github.com/containerd/nerdctl/releases/download/v$(NERDCTL_VERSION)/$(NERDCTL_VERSION_FILE); \
+		fi; \
+	else \
+		echo "File $(NERDCTL_FILE_PATH) already exists. Skipping download."; \
+	fi
+	@tar zxvf $(NERDCTL_FILE_PATH) -C /usr/local/bin
+	@if [ ! -f $(BUILDKIT_VERSION_PATH) ]; then \
+		echo "File $(BUILDKIT_VERSION_PATH) does not exist. Downloading..."; \
+		if [ -n "$(GITHUB_PROXY)" ]; then \
+			wget -P $(DOWNLOAD_DIR) $(GITHUB_PROXY)/https://github.com/moby/buildkit/releases/download/$(BUILDKIT_VERSION)/$(BUILDKIT_VERSION_FILE); \
+		else \
+			wget -P $(DOWNLOAD_DIR) https://github.com/moby/buildkit/releases/download/$(BUILDKIT_VERSION)/$(BUILDKIT_VERSION_FILE); \
+		fi; \
+	else \
+		echo "File $(BUILDKIT_VERSION_PATH) already exists. Skipping download."; \
+	fi
+	@tar zxvf $(BUILDKIT_VERSION_PATH) -C /usr/local 
 
 pull:
 	@for image in $(IMAGES); do \
