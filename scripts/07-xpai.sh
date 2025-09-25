@@ -3,6 +3,10 @@ function installXpai() {
     local manifestsDir="${script_dir}/manifests"
     local templatesDir="${script_dir}/artifacts/templates"
     local template="xpai.yaml"
+    local templates=(
+        "xpai.yaml"
+        "kubegems.mapi.yaml"
+    )
     local manifest=${manifestsDir}/${template}
     local file
 
@@ -18,20 +22,21 @@ function installXpai() {
 
     # Log start of installation
     log INFO $product "Trying to preparing xpai manifests."
-    file=${templatesDir}/${template}
 
-    if [ -e "${file}.template" ]; then
-        if envsubst < ${file}.template > ${manifest}; then
-            log INFO $product "Manifest ${file} is saved in ${manifestsDir}."
+    for template in "${templates[@]}"; do
+        if [ -e "${templatesDir}/${template}.template" ]; then
+            log INFO $product "Templating: ${templatesDir}/${template}.template."
+            if envsubst < "${templatesDir}/${template}.template" > ${manifestsDir}/${template}; then
+                log INFO $product "Manifest file ${template} saved in ${manifestsDir}."
+            else
+                log ERROR $product "Failed to template ${templatesDir}/${template}.template ."
+                exit 1
+            fi
         else
-            log ERROR $product "Failed to template ${file}.template."
+            log ERROR $product "Can't find template ${templatesDir}/${template}.template."
             exit 1
         fi
-    else
-        log ERROR $product "Can't find template ${file}.template ."
-        exit 1
-    fi
-
+    done
 
     cd "${manifestsDir}" || {
         log ERROR $product "Failed to change directory to ${manifestsDir}."
@@ -40,15 +45,19 @@ function installXpai() {
 
     log INFO $product "Trying to install xpai."
 
-    if [ -e "${manifest}" ]; then
-        if  kubectl apply --force -f ${manifest} > /dev/null 2>&1; then
-            log INFO $product "Manifest ${manifest} is applied."
+    local files=("${templates[@]}")
+
+    for file in "${files[@]}"; do
+        if [ -e "${file}" ]; then
+            if kubectl apply --force -f ${file} > /dev/null 2>&1; then
+                log INFO $product "Manifest file ${manifestsDir}/${file} is applied."
+            else
+                log ERROR $product "Failed to apply ${manifestsDir}/${file}."
+                exit 1
+            fi
         else
-            log ERROR $product "Failed to apply ${manifest}."
+            log ERROR $product "Can't find manifest ${manifestsDir}/${file}."
             exit 1
         fi
-    else
-        log ERROR $product "Can't find manifest ${manifest}"
-        exit 1
-    fi
+    done
 }

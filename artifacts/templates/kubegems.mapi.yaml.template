@@ -1,0 +1,121 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubegems-mapi
+  namespace: kubegems-pai
+  labels:
+    app.kubernetes.io/instance: kubegems-mapi
+    app.kubernetes.io/name: kubegems-mapi
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: kubegems-mapi
+        app.kubernetes.io/name: kubegems-mapi
+    spec:
+      containers:
+        - name: kubegems-mapi
+          image: registry.cn-hangzhou.aliyuncs.com/xiaoshiai/mapi:latest
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          env:
+            - name: SQL_DSN
+              value: root:123456@tcp(kubegems-pai-mysql:3306)/mapi
+            - name: TZ
+              value: Asia/Shanghai
+            - name: SESSION_SECRET
+              value: xiaoshiai
+          resources: {}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+          securityContext: {}
+      volumes:
+        - name: data
+          emptyDir: {}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      serviceAccountName: default
+      serviceAccount: default
+      securityContext: {}
+      schedulerName: default-scheduler
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: kubegems-mapi
+      app.kubernetes.io/name: kubegems-mapi
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: kubegems-mapi
+  namespace: kubegems-pai
+  labels:
+    app.kubernetes.io/instance: kubegems-mapi
+    app.kubernetes.io/name: kubegems-mapi
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3000
+      targetPort: http
+  selector:
+    app.kubernetes.io/instance: kubegems-mapi
+    app.kubernetes.io/name: kubegems-mapi
+  type: ClusterIP
+
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: kubegems-mapi
+  namespace: kubegems-pai
+  labels:
+    networking.kubegems.io/ingressClass: default-gateway
+spec:
+  ingressClassName: default-gateway
+  rules:
+    - host: mapi.${baseHost}
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: kubegems-mapi
+                port:
+                  name: http

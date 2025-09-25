@@ -116,3 +116,33 @@ fs.inotify.max_user_watches=2099999999
 fs.inotify.max_user_instances=2099999999
 fs.inotify.max_queued_events=2099999999
 ```
+
+3. MAPI服务部署完后需要手动设置下 deploy 中的 mysql 密码，和手动创建数据库
+
+```
+进入 kubegems-pai 的数据库中创建
+create database mapi;
+```
+
+4. 如果需要使用在离线环境 build 镜像，则在部署前先执行如下命令
+
+```
+make nerdctl
+
+
+# 配置 buildkit 工具
+cat > /etc/systemd/system/buildkit.service << EOF
+[Unit]
+Description=Buildkit
+Documentation=https://github.com/moby/buildkit
+[Service]
+ExecStart=/usr/local/bin/buildkitd --oci-worker=false --containerd-worker=true
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable buildkit
+systemctl start buildkit
+```
+
+nerdctl是一个 docker 的平替工具
