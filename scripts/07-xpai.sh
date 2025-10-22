@@ -19,6 +19,7 @@ function installXpai() {
         log ERROR $product "Failed to change directory to ${templatesDir}."
         exit 1
     }
+    export baseHostWithoutPort=${baseHost%%:*}
 
     # Log start of installation
     log INFO $product "Trying to preparing xpai manifests."

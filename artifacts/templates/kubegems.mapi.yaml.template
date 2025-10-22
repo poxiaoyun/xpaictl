@@ -109,7 +109,7 @@ metadata:
 spec:
   ingressClassName: default-gateway
   rules:
-    - host: mapi.${baseHost}
+    - host: mapi.${baseHostWithoutPort}
       http:
         paths:
           - path: /
