@@ -1,0 +1,14 @@
+mainVersion=1.24.10
+xpaiVersion=1.0.12
+xpaiExtension=false
+kubernetesVersion=v1.25.10
+sshPassword=magine
+sshPort=22
+defaultDir=/data
+cache=true
+cacheDev=/dev/sdb
+baseHost=192.168.0.27.nip.io:30000
+installNvidiaDriver=false
+enableVgpu=true
+installMinio=true
+minioArchitecture=standalone

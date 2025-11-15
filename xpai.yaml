@@ -1,6 +1,6 @@
 ###############################  Global Setting ################################################
 # 产品主版本，一般默认不需要修改
-mainVersion: 1.24.9
+mainVersion: 1.24.10
 
 # 智算平台XPAI版本
 xpaiVersion: 1.0.12
@@ -9,7 +9,7 @@ xpaiVersion: 1.0.12
 # productSuffix: qcloud
 
 # 安装扩展镜像包，包含XPAI平台内置的训练、推理框架镜像和平台tookit辅助镜像
-# 由于扩展镜像包很大，约60GB，目标机器如果磁盘性能一般会导致安装时间很长
+# 由于扩展镜像包很大，约60GB，目标机器如果磁盘性能一般会导致安装时间非常长
 # 通常如果您的目标主机能够访问互联网，可以关闭扩展镜像包的安装，由平台第一次调度任务时从互联网上下载
 # 如果您的环境是离线或者不能访问互联网，请务必打开扩展镜像包
 xpaiExtension: false
@@ -34,14 +34,14 @@ kubernetesVersion: v1.25.10
 sshPassword: <target_ssh_paassword>
 
 # SSH 登录端口，xpaictl.sh将使用$sshPort 端口远程登录主机进行安装,确保所有主机的ssh端口一样
-#sshPort: 22
-sshPort: <target_ssh_port>
+#sshPort: <target_ssh_port>
+sshPort: 22
 
 ############################### 默认数据和安装路径配置 ####################################
 
 # XPAI集群所有节点默认的数据存放路径
-#defaultDir: /data
-defaultDir: <target_data_path>
+#defaultDir: <target_directory>
+defaultDir: /data
 
 # XPAI 数据缓存配置，默认关闭,设置成 true 打开数据缓存功能，需指定缓存硬盘
 cache: false
@@ -49,8 +49,8 @@ cache: false
 # !!! 注意数据!!!
 # cache 启用后，缓存硬盘设备在安装过程中会被格式化，请注意数据备份
 # 当前仅支持一块硬盘设备，如果有多块硬盘可提前做好 raid 
-#cacheDev: /dev/sdb
-cacheDev: <target_device>
+#cacheDev: <target_cache_device>
+cacheDev: /dev/sdb
 # TODO: 仅支持一次性挂载到/var/jfsCache目录，重启后失效，需持久化配置
 
 ############################### Host ######################################################
@@ -93,7 +93,7 @@ baseHost: <your_domain_name>[:<target_port>]
 installNvidiaDriver: false
 
 # 是否启用GPU虚拟化，默认开启
-enableVgpu: true
+enableVgpu: false
 
 ############################### Object Storage Config ######################################
 

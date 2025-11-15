@@ -23,7 +23,7 @@ spec:
               protocol: TCP
           env:
             - name: SQL_DSN
-              value: root:123456@tcp(kubegems-pai-mysql:3306)/mapi
+              value: root:${MYSQL_ROOT_PASSWORD}@tcp(kubegems-pai-mysql:3306)/mapi
             - name: TZ
               value: Asia/Shanghai
             - name: SESSION_SECRET

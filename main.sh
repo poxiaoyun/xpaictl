@@ -57,6 +57,7 @@ function main(){
     installNvidiaOperator
     wait_until_running deployment gpu-operator gpu-operator 300
     installXpai
+    installMapi
     wait_until_running statefulset kubegems-pai-mysql kubegems-pai 300
     wait_until_running deployment kubegems-pai-api kubegems-pai 300
     wait_until_running deployment kubegems-pai-controller kubegems-pai 300

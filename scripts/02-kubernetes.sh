@@ -110,15 +110,47 @@ function installKubernetes() {
     fi
 
     if sealos exec -c default "sysctl -w fs.inotify.max_user_instances=$MAX_USER_INSTANCES_VALUE"  > /dev/null 2>&1; then
-        log DEBUG $product "Excute: sysctl -w fs.inotify.max_user_watches=$MAX_USER_WATCHES_VALUE"
+        log DEBUG $product "Excute: sysctl -w fs.inotify.max_user_instances=$MAX_USER_INSTANCES_VALUE"
     else 
-        log ERROR $product "Excute failed: sysctl -w fs.inotify.max_user_watches=$MAX_USER_WATCHES_VALUE"
+        log ERROR $product "Excute failed: sysctl -w fs.inotify.max_user_instances=$MAX_USER_INSTANCES_VALUE"
     fi
 
     if sealos exec -c default "sysctl -w fs.inotify.max_queued_events=$MAX_QUEUED_EVENTS_VALUE"  > /dev/null 2>&1; then
         log DEBUG $product "Excute: sysctl -w fs.inotify.max_queued_events=$MAX_QUEUED_EVENTS_VALUE"
     else 
         log ERROR $product "Excute failed: sysctl -w fs.inotify.max_queued_events=$MAX_QUEUED_EVENTS_VALUE"
+    fi
+
+    # Persist kernel parameters to /etc/sysctl.conf
+    log INFO $product "Persisting kernel parameters to /etc/sysctl.conf"
+    if sealos exec -c default "grep -q 'fs.inotify.max_user_watches' /etc/sysctl.conf 2>/dev/null"; then
+        log DEBUG $product "fs.inotify.max_user_watches already exists in /etc/sysctl.conf, skipping"
+    else
+        if sealos exec -c default "echo 'fs.inotify.max_user_watches=$MAX_USER_WATCHES_VALUE' >> /etc/sysctl.conf" > /dev/null 2>&1; then
+            log DEBUG $product "Added fs.inotify.max_user_watches to /etc/sysctl.conf"
+        else
+            log ERROR $product "Failed to add fs.inotify.max_user_watches to /etc/sysctl.conf"
+        fi
+    fi
+
+    if sealos exec -c default "grep -q 'fs.inotify.max_user_instances' /etc/sysctl.conf 2>/dev/null"; then
+        log DEBUG $product "fs.inotify.max_user_instances already exists in /etc/sysctl.conf, skipping"
+    else
+        if sealos exec -c default "echo 'fs.inotify.max_user_instances=$MAX_USER_INSTANCES_VALUE' >> /etc/sysctl.conf" > /dev/null 2>&1; then
+            log DEBUG $product "Added fs.inotify.max_user_instances to /etc/sysctl.conf"
+        else
+            log ERROR $product "Failed to add fs.inotify.max_user_instances to /etc/sysctl.conf"
+        fi
+    fi
+
+    if sealos exec -c default "grep -q 'fs.inotify.max_queued_events' /etc/sysctl.conf 2>/dev/null"; then
+        log DEBUG $product "fs.inotify.max_queued_events already exists in /etc/sysctl.conf, skipping"
+    else
+        if sealos exec -c default "echo 'fs.inotify.max_queued_events=$MAX_QUEUED_EVENTS_VALUE' >> /etc/sysctl.conf" > /dev/null 2>&1; then
+            log DEBUG $product "Added fs.inotify.max_queued_events to /etc/sysctl.conf"
+        else
+            log ERROR $product "Failed to add fs.inotify.max_queued_events to /etc/sysctl.conf"
+        fi
     fi
 
     if ${cache}; then
@@ -130,8 +162,24 @@ function installKubernetes() {
         fi
 
         mkdir -p ${CacheDir}
+        if sealos exec -c default "mkdir -p ${CacheDir}" > /dev/null 2>&1; then
+            log DEBUG $product "Created directory ${CacheDir}"
+        fi
+        
         if sealos exec -c default "mount -o allocsize=1g,noatime,nodiratime ${cacheDev} ${CacheDir}"  > /dev/null 2>&1; then
             log INFO $product "${cacheDev} has been mounted to ${CacheDir}."
+            
+            # Persist mount entry to /etc/fstab
+            log INFO $product "Persisting cache device mount to /etc/fstab"
+            if sealos exec -c default "grep -q '${cacheDev}.*${CacheDir}' /etc/fstab 2>/dev/null"; then
+                log DEBUG $product "Mount entry for ${cacheDev} already exists in /etc/fstab, skipping"
+            else
+                if sealos exec -c default "echo '${cacheDev} ${CacheDir} xfs allocsize=1g,noatime,nodiratime 0 0' >> /etc/fstab" > /dev/null 2>&1; then
+                    log INFO $product "Added mount entry for ${cacheDev} to /etc/fstab"
+                else
+                    log ERROR $product "Failed to add mount entry for ${cacheDev} to /etc/fstab"
+                fi
+            fi
         else
             log ERROR $product "${CacheDir} mounted failed."
         fi

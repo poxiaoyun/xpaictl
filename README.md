@@ -28,13 +28,9 @@ productSuffix: <厂家名称>
 ```bash
 #构建stack包
 make package
-
-#构建extension包
-make package-extension
 ```
 
 执行完成后，离线镜像会保存在 `artifacts/images`目录下，此时将本工程整体拷贝到被安装机器上开始安装
-
 
 
 ### 安装xpai
@@ -108,7 +104,7 @@ make package-extension
 /dev/sda /var/jfsCache/ xfs defaults 0 0
 ```
 
-2. 内核的参数没有持久化到/etc/sysctl.conf中，需手动配置
+~~2. 内核的参数没有持久化到/etc/sysctl.conf中，需手动配置~~
 
 ```
 # 样例,所有节点都需要配置
@@ -117,14 +113,15 @@ fs.inotify.max_user_instances=2099999999
 fs.inotify.max_queued_events=2099999999
 ```
 
-3. MAPI服务部署完后需要手动设置下 deploy 中的 mysql 密码，和手动创建数据库
+~~3. MAPI服务部署完后需要手动设置下 deploy 中的 mysql 密码，和手动创建数据库~~
 
 ```
 进入 kubegems-pai 的数据库中创建
 create database mapi;
 ```
 
-4. 如果需要使用在离线环境 build 镜像，则在部署前先执行如下命令
+### 扩展
+1. 如果需要使用在离线环境 build 镜像，则在部署前先执行如下命令
 
 ```
 make nerdctl
