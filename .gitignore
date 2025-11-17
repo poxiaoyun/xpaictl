@@ -2,3 +2,4 @@
 *.tar
 *.zip
 *.gzip
+artifacts/env
