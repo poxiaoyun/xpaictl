@@ -1,0 +1,230 @@
+/* XPAI 文档样式 - 引用块美化 */
+
+/* 基础引用块样式 */
+blockquote {
+  margin: 1em 0;
+  padding: 1em 1.5em;
+  border-left: 4px solid #1890ff;
+  background-color: #f0f7ff;
+  color: #333;
+  border-radius: 4px;
+  font-style: normal;
+  position: relative;
+}
+
+/* 提示类型引用块 */
+blockquote.tip,
+blockquote[class*="tip"] {
+  border-left-color: #52c41a;
+  background-color: #f6ffed;
+}
+
+blockquote.tip::before {
+  content: "💡 提示：";
+  font-weight: bold;
+  color: #52c41a;
+  display: block;
+  margin-bottom: 0.5em;
+}
+
+/* 说明类型引用块 */
+blockquote.info,
+blockquote[class*="info"] {
+  border-left-color: #1890ff;
+  background-color: #e6f7ff;
+}
+
+blockquote.info::before {
+  content: "ℹ️ 说明：";
+  font-weight: bold;
+  color: #1890ff;
+  display: block;
+  margin-bottom: 0.5em;
+}
+
+/* 警告类型引用块 */
+blockquote.warning,
+blockquote[class*="warning"] {
+  border-left-color: #faad14;
+  background-color: #fffbe6;
+}
+
+blockquote.warning::before {
+  content: "⚠️ 警告：";
+  font-weight: bold;
+  color: #faad14;
+  display: block;
+  margin-bottom: 0.5em;
+}
+
+/* 危险类型引用块 */
+blockquote.danger,
+blockquote[class*="danger"] {
+  border-left-color: #ff4d4f;
+  background-color: #fff1f0;
+}
+
+blockquote.danger::before {
+  content: "🚨 注意：";
+  font-weight: bold;
+  color: #ff4d4f;
+  display: block;
+  margin-bottom: 0.5em;
+}
+
+/* 成功类型引用块 */
+blockquote.success,
+blockquote[class*="success"] {
+  border-left-color: #52c41a;
+  background-color: #f6ffed;
+}
+
+blockquote.success::before {
+  content: "✅ 成功：";
+  font-weight: bold;
+  color: #52c41a;
+  display: block;
+  margin-bottom: 0.5em;
+}
+
+/* 移除默认的引用符号 */
+blockquote p {
+  margin: 0;
+  display: inline;
+}
+
+blockquote p:first-child {
+  margin-top: 0;
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* ============================================
+   表格样式
+   ============================================ */
+
+/* 表格容器 - 自动填满宽度 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+/* 表头样式 */
+table thead {
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  color: #fff;
+}
+
+table th {
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #0050b3;
+}
+
+table th:first-child {
+  padding-left: 20px;
+}
+
+table th:last-child {
+  padding-right: 20px;
+}
+
+/* 表格主体样式 */
+table tbody {
+  background-color: #fff;
+}
+
+table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+table tbody tr:hover {
+  background-color: #f5f7fa;
+}
+
+table tbody tr:last-child {
+  border-bottom: none;
+}
+
+/* 表格单元格样式 */
+table td {
+  padding: 12px 16px;
+  color: #333;
+  line-height: 1.6;
+  vertical-align: top;
+}
+
+table td:first-child {
+  padding-left: 20px;
+  font-weight: 500;
+  color: #262626;
+}
+
+table td:last-child {
+  padding-right: 20px;
+}
+
+/* 表格中的代码块样式 */
+table td code {
+  background-color: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 13px;
+  color: #e83e8c;
+}
+
+/* 表格中的链接样式 */
+table td a {
+  color: #1890ff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+table td a:hover {
+  color: #0050b3;
+  text-decoration: underline;
+}
+
+/* 斑马纹表格（可选） */
+table.striped tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+table.striped tbody tr:nth-child(even):hover {
+  background-color: #f0f2f5;
+}
+
+/* 紧凑型表格 */
+table.compact th,
+table.compact td {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+/* 响应式表格 - 小屏幕时横向滚动 */
+@media screen and (max-width: 768px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  table th,
+  table td {
+    min-width: 120px;
+  }
+}
