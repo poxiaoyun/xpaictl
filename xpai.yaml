@@ -31,7 +31,7 @@ kubernetesVersion: v1.25.10
 
 # SSH root账号的登录密码，xpaictl.sh将用这个密码远程登录主机进行安装,确保所有主机的root密码正确
 #sshPassword: demo!@#admin
-sshPassword: <target_ssh_paassword>
+sshPassword: magine
 
 # SSH 登录端口，xpaictl.sh将使用$sshPort 端口远程登录主机进行安装,确保所有主机的ssh端口一样
 #sshPort: <target_ssh_port>
@@ -65,7 +65,7 @@ cacheDev: /dev/sdb
 # 提示： 环境默认端口是30000，对应的是默认的`default-gateway`网关,要修改端口成80或433端口
 # 第一步先将baseHost的端口删除正常部署，第二步在平台部署完成后手动将网关对应的网络设置成`hostNetwork`
 
-baseHost: <your_domain_name>[:<target_port>]
+#baseHost: <your_domain_name>[:<target_port>]
 
 # 关于域名的说明
 # 1.如果您没有公网域名，也不需要自定义域名，可以选择直接使用 nip.io 提供的免费域名服务。
@@ -74,7 +74,7 @@ baseHost: <your_domain_name>[:<target_port>]
 
 # 例如，如果你有一个内网 IP 地址 192.168.0.1，你可以使用 192.168.0.1.nip.io 作为域名
 # 所有向这个域名发送的请求都会被解析到 192.168.0.1 这个 IP 地址上
-# baseHost: 192.168.0.1.nip.io:30000
+baseHost: 192.168.0.27.nip.io:30000
 
 # 2.如果您有公网域名，只需要在域名服务商处添加一条该域名的 A 记录，地址解析到第一个Master节点的IP地址
 

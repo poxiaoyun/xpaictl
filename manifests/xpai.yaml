@@ -1,0 +1,40 @@
+apiVersion: plugins.kubegems.io/v1beta1
+kind: Plugin
+metadata:
+  annotations:
+    plugins.kubegems.io/category: core/KubeGems
+    plugins.kubegems.io/description: KubeGems PAI components
+  name: kubegems-pai
+  namespace: kubegems-installer
+spec:
+  chart: kubegems-pai
+  installNamespace: kubegems-pai
+  kind: helm
+  url: https://charts.kubegems.io/kubegems
+  version: 1.0.12
+  values:
+    api:
+      enabled: true
+    controller:
+      enabled: true
+      ingress:
+        baseHost: 192.168.0.27.nip.io:30000
+        className: default-gateway
+      s3:
+        accessKey: minioadmin
+        addr: http://xpai-minio.kubegems-pai:9000
+        bucket: ""
+        capacity: 10240Gi
+        pathStyle: true
+        secretKey: minioadmin
+      volcano:
+        enabled: true
+        vgpu:
+          enabled: false
+    node:
+      enabled: true
+  valuesFrom:
+  - kind: ConfigMap
+    name: kubegems-global-values
+    optional: true
+    prefix: global.
