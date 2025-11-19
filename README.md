@@ -279,19 +279,19 @@ CREATE DATABASE mapi;
 
 ---
 
-## 高级功能
+## Q&A
 
-### 离线环境镜像构建
+### 1.离线环境镜像构建
 
 如需在离线环境中构建镜像，请在部署前先执行以下步骤：
 
-#### 1. 安装 nerdctl 工具
+#### 安装 nerdctl 工具
 
 ```bash
 make nerdctl
 ```
 
-#### 2. 配置 buildkit 服务
+#### 配置 buildkit 服务
 
 创建 buildkit 服务配置文件：
 
@@ -307,7 +307,7 @@ WantedBy=multi-user.target
 EOF
 ```
 
-#### 3. 启动 buildkit 服务
+#### 启动 buildkit 服务
 
 ```bash
 systemctl enable buildkit
@@ -317,6 +317,68 @@ systemctl start buildkit
 <blockquote style="margin: 1em 0; padding: 1em 1.5em; border-left: 4px solid #1890ff; background-color: #e6f7ff; border-radius: 4px; font-style: normal;">
 <strong style="color: #1890ff;">ℹ️ 说明：</strong> nerdctl 是 Docker 的替代工具，适用于 containerd 容器运行时环境。
 </blockquote>
+
+### 2. 更换平台域名
+
+XPAI 平台部署完成后，如需更新访问域名，无需重新执行 `xpaictl`安装，按以下步骤依次修改：
+
+#### 修改浏览器访问域名
+
+```
+kubectl edit plugin -n kubegems-installer kubegems
+
+...
+spec:
+  installNamespace: kubegems
+  kind: helm
+  url: https://charts.kubegems.io/kubegems
+  values:
+    api:
+...
+    dashboard:
+...
+    ingress:
+      hostname: console.xpai.xiaoshiai.cn    \\ 将此处替换为新的控制台域名
+...
+```
+
+#### 修改内部服务域名
+
+```
+kubectl edit plugin -n kubegems-installer kubegems-pai
+
+spec:
+  chart: kubegems-pai
+  installNamespace: kubegems-pai
+  kind: helm
+  url: https://charts.kubegems.io/kubegems
+  values:
+    api:
+...
+    controller:
+...
+      ingress:
+        baseHost: xpai.xiaoshiai.cn         \\ 替换为新的基础泛域名
+        className: default-gateway
+        tls:
+          enabled: true
+          existsSecretName: start-develop-xiaoshiai-cn-tls
+      s3:
+```
+
+<blockquote style="margin: 1em 0; padding: 1em 1.5em; border-left: 4px solid #faad14; background-color: #fffbe6; border-radius: 4px; font-style: normal;">
+<strong style="color: #faad14;">⚠️ 重要提示：</strong> 这里baseHost指的泛域名，XPAI 平台内部创建的服务通过它生成随机域名。
+</blockquote>
+
+#### 检查结果
+
+```
+# 检查 Web 域名是否已生效
+kubectl get ing -n kubegems
+
+# 检查内部服务域名是否已生效
+kubectl get ing -n kubegems-pai
+```
 
 ---
 
