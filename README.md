@@ -184,6 +184,10 @@ make package-extension-ascend
 
 ### 3. 离线部署
 
+<blockquote style="margin: 1em 0; padding: 1em 1.5em; border-left: 4px solid #1890ff; background-color: #e6f7ff; border-radius: 4px; font-style: normal;">
+<strong style="color: #1890ff;">ℹ️ 说明：</strong> 在离线环境下部署，请先在有网环境下「执行镜像构建」步骤后，再将本项目整体拷贝到目标机器上进行安装。
+</blockquote>
+
 #### 3.1 单节点离线部署
 
 离线部署单节点（172.16.1.1）的 XPAI 平台：
@@ -217,11 +221,11 @@ make package-extension-ascend
 如需卸载 XPAI 平台，执行以下命令即可将环境重置：
 
 ```bash
-sealos reset
+make reset
 ```
 
 <blockquote style="margin: 1em 0; padding: 1em 1.5em; border-left: 4px solid #ff4d4f; background-color: #fff1f0; border-radius: 4px; font-style: normal;">
-<strong style="color: #ff4d4f;">🚨 警告：</strong> 执行卸载操作将清除所有平台数据，请谨慎操作。
+<strong style="color: #ff4d4f;">🚨 警告：</strong> 执行卸载操作将清除所有平台数据，包括 License重置，请谨慎操作。
 </blockquote>
 
 ---
@@ -234,7 +238,7 @@ sealos reset
 
 ```bash
 # 示例配置（请根据实际磁盘设备调整）
-/dev/sda /var/jfsCache/ xfs defaults 0 0
+/dev/sdb /var/jfsCache/ xfs defaults 0 0
 ```
 
 配置完成后执行：

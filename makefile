@@ -138,7 +138,7 @@ pull-extension-ascend:
 	done
 
 save:
-	bash -c 'source ./scripts/utils.sh; \
+	@bash -c 'source ./scripts/utils.sh; \
 	 mkdir -p ${SEALOS_IMAGE_PATH}; \
 	 for image in $(IMAGES); do \
 		file=$$(convert_image_to_tar $${image}); \
@@ -149,7 +149,7 @@ save:
 	done'
 
 save-extension-nvidia:
-	bash -c 'source ./scripts/utils.sh; \
+	@bash -c 'source ./scripts/utils.sh; \
 	 mkdir -p ${SEALOS_IMAGE_PATH}; \
 	 for image in $(NVIDIA_EXTENSION_IMAGES); do \
 		file=$$(convert_image_to_tar $${image}); \
@@ -160,7 +160,7 @@ save-extension-nvidia:
 	done'
 
 save-extension-ascend:
-	bash -c 'source ./scripts/utils.sh; \
+	@bash -c 'source ./scripts/utils.sh; \
 	 mkdir -p ${SEALOS_IMAGE_PATH}; \
 	 for image in $(ASCEND_EXTENSION_IMAGES); do \
 		file=$$(convert_image_to_tar $${image}); \
@@ -183,6 +183,13 @@ package-extension-ascend:
 	@$(MAKE) pull-extension-ascend
 	@$(MAKE) save-extension-ascend
 
+
+reset:
+	@bash -c 'source ./scripts/utils.sh; \
+		source ./artifacts/env; \
+		echo "注意，此操作会删除所有XPAI平台数据,包括 License 信息，请谨慎操作！"; \
+		export SEALOS_RUNTIME_ROOT=$${defaultDir}/.sealos; \
+		sealos reset;'
 
 load:
 	bash -c 'source ./scripts/utils.sh; \

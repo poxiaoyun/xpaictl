@@ -6,7 +6,7 @@ mainVersion: 1.24.10
 xpaiVersion: 1.0.12
 
 # 产品后缀,默认为空。此配置为OEM厂家配置，安装前需确定目标客户是否为OEM版本
-# productSuffix: qcloud
+# productSuffix: 
 
 # 安装扩展镜像包，包含XPAI平台内置的训练、推理框架镜像和平台tookit辅助镜像
 # 由于扩展镜像包很大，约60GB，目标机器如果磁盘性能一般会导致安装时间非常长
@@ -30,8 +30,8 @@ kubernetesVersion: v1.25.10
 # 在配置文件 /etc/ssh/sshd_config 中的 `PermitRootLogin yes` 设置
 
 # SSH root账号的登录密码，xpaictl.sh将用这个密码远程登录主机进行安装,确保所有主机的root密码正确
-#sshPassword: demo!@#admin
-sshPassword: magine
+#sshPassword: <target_ssh_password>
+sshPassword: demo!@#admin
 
 # SSH 登录端口，xpaictl.sh将使用$sshPort 端口远程登录主机进行安装,确保所有主机的ssh端口一样
 #sshPort: <target_ssh_port>
@@ -74,7 +74,8 @@ cacheDev: /dev/sdb
 
 # 例如，如果你有一个内网 IP 地址 192.168.0.1，你可以使用 192.168.0.1.nip.io 作为域名
 # 所有向这个域名发送的请求都会被解析到 192.168.0.1 这个 IP 地址上
-baseHost: 192.168.0.27.nip.io:30000
+
+baseHost: 192.168.0.1.nip.io:30000
 
 # 2.如果您有公网域名，只需要在域名服务商处添加一条该域名的 A 记录，地址解析到第一个Master节点的IP地址
 

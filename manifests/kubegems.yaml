@@ -50,7 +50,7 @@ spec:
         type: NodePort
     ingress:
       enabled: true
-      hostname: console.192.168.0.27.nip.io:30000
+      hostname: console.192.168.0.39.nip.io:30000
       ingressClassName: default-gateway
     argo-cd:
       enabled: false

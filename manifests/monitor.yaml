@@ -21,7 +21,7 @@ spec:
   url: https://charts.kubegems.io/kubegems
   values:
     alertmanager:
-      externalHost: alertmanager.192.168.0.27.nip.io
+      externalHost: alertmanager.192.168.0.39.nip.io
       externalPort: 9093
       maxCpu: 500m
       maxMemory: 256Mi
@@ -29,7 +29,7 @@ spec:
       retention: 168h
       volumeCapacity: 10Gi
     prometheus:
-      externalHost: prometheus.192.168.0.27.nip.io
+      externalHost: prometheus.192.168.0.39.nip.io
       externalPort: 9090
       maxCpu: "4"
       maxMemory: 8Gi
