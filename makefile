@@ -48,11 +48,21 @@ IMAGES := $(shell bash -c 'source ./scripts/utils.sh && parse_config_nolog xpai.
     }; \
     localXpaiImages')
 
-EXTENSION_IMAGES := $(shell bash -c 'source ./scripts/utils.sh && parse_config_nolog xpai.yaml ; \
+NVIDIA_EXTENSION_IMAGES := $(shell bash -c 'source ./scripts/utils.sh && parse_config_nolog xpai.yaml ; \
     function localXpaiExtensionImages() { \
 		source ./artifacts/env ;\
         local images=( \
-			"registry.cn-hangzhou.aliyuncs.com/xiaoshiai/xpai-extension:$${mainVersion}" \
+			"registry.cn-hangzhou.aliyuncs.com/xiaoshiai/xpai-extension:$${mainVersion}-nvidia" \
+        ); \
+        echo $${images[@]}; \
+    }; \
+    localXpaiExtensionImages')
+
+ASCEND_EXTENSION_IMAGES := $(shell bash -c 'source ./scripts/utils.sh && parse_config_nolog xpai.yaml ; \
+    function localXpaiExtensionImages() { \
+		source ./artifacts/env ;\
+        local images=( \
+			"registry.cn-hangzhou.aliyuncs.com/xiaoshiai/xpai-extension:$${mainVersion}-ascend" \
         ); \
         echo $${images[@]}; \
     }; \
@@ -115,8 +125,14 @@ pull:
 		sealos pull $$image; \
 	done
 
-pull-extension:
-	@for image in $(EXTENSION_IMAGES); do \
+pull-extension-nvidia:
+	@for image in $(NVIDIA_EXTENSION_IMAGES); do \
+		echo "Pulling $$image"; \
+		sealos pull $$image; \
+	done
+
+pull-extension-ascend:
+	@for image in $(ASCEND_EXTENSION_IMAGES); do \
 		echo "Pulling $$image"; \
 		sealos pull $$image; \
 	done
@@ -132,10 +148,10 @@ save:
 		fi ;\
 	done'
 
-save-extension:
+save-extension-nvidia:
 	bash -c 'source ./scripts/utils.sh; \
 	 mkdir -p ${SEALOS_IMAGE_PATH}; \
-	 for image in $(EXTENSION_IMAGES); do \
+	 for image in $(NVIDIA_EXTENSION_IMAGES); do \
 		file=$$(convert_image_to_tar $${image}); \
 		if [ ! -f "${SEALOS_IMAGE_PATH}/$${file}" ]; then \
 			sealos pull $$image; \
@@ -143,15 +159,29 @@ save-extension:
 		fi ;\
 	done'
 
+save-extension-ascend:
+	bash -c 'source ./scripts/utils.sh; \
+	 mkdir -p ${SEALOS_IMAGE_PATH}; \
+	 for image in $(ASCEND_EXTENSION_IMAGES); do \
+		file=$$(convert_image_to_tar $${image}); \
+		if [ ! -f "${SEALOS_IMAGE_PATH}/$${file}" ]; then \
+			sealos pull $$image; \
+			sealos save -o ${SEALOS_IMAGE_PATH}/$${file} $$image ;\
+		fi ;\
+	done'
 
 package:
 	@$(MAKE) sealos
 	@$(MAKE) pull
 	@$(MAKE) save
 
-package-extension:
-	@$(MAKE) pull-extension
-	@$(MAKE) save-extension
+package-extension-nvidia:
+	@$(MAKE) pull-extension-nvidia
+	@$(MAKE) save-extension-nvidia
+
+package-extension-ascend:
+	@$(MAKE) pull-extension-ascend
+	@$(MAKE) save-extension-ascend
 
 
 load:

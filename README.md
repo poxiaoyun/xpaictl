@@ -120,10 +120,10 @@ productSuffix: <厂家名称>
 make package
 
 # 如果网络条件允许，构建离线 extension-nvidia 包
-make extension-nvidia
+make package-extension-nvidia
 
 # 构建离线 extension-ascend 华为昇腾环境包
-make extension-ascend
+make package-extension-ascend
 ```
 
 ### 4. 构建结果
