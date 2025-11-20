@@ -26,6 +26,9 @@ kubernetesVersion: v1.25.10
 # 安装OpenEBS的版本，默认离线环境下只支持3.9.0
 # ebsVersion: 3.9.0
 
+# 安装 Volcano 的版本，默认离线环境下只支持1.12.1
+# volcanoVersion: 1.12.1
+
 # SSH 配置，部署前请确保安装集群下所有的root账号均允许远程登录
 # 在配置文件 /etc/ssh/sshd_config 中的 `PermitRootLogin yes` 设置
 
@@ -75,7 +78,7 @@ cacheDev: /dev/sdb
 # 例如，如果你有一个内网 IP 地址 192.168.0.1，你可以使用 192.168.0.1.nip.io 作为域名
 # 所有向这个域名发送的请求都会被解析到 192.168.0.1 这个 IP 地址上
 
-baseHost: 192.168.0.1.nip.io:30000
+baseHost: 10.0.0.1.nip.io:30000
 
 # 2.如果您有公网域名，只需要在域名服务商处添加一条该域名的 A 记录，地址解析到第一个Master节点的IP地址
 

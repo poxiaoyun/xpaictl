@@ -61,9 +61,15 @@ function main(){
     wait_until_running statefulset kubegems-pai-mysql kubegems-pai 300
     wait_until_running deployment kubegems-pai-api kubegems-pai 300
     wait_until_running deployment kubegems-pai-controller kubegems-pai 300
+    installVolcano
     wait_until_running deployment volcano-scheduler volcano-system 300
     wait_until_running deployment volcano-controllers volcano-system 300
     wait_until_running statefulset juicefs-csi-controller juicefs-system 300
+    if [[ "${enableVgpu}" == "true" ]];then
+        installvGPU
+    else
+        log INFO $product "vGPU is disabled."
+    fi
 
     host="console.${baseHost}"
     token=$(get_gems_token ${host})

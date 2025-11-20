@@ -28,7 +28,7 @@ spec:
         pathStyle: true
         secretKey: minioadmin
       volcano:
-        enabled: true
+        enabled: false
         vgpu:
           enabled: ${enableVgpu}
     node:

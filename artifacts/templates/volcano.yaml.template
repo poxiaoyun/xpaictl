@@ -1,0 +1,8 @@
+basic:
+  controller_image_name: "kubegems/vc-controller-manager"
+  scheduler_image_name: "kubegems/vc-scheduler"
+  admission_image_name: "kubegems/vc-webhook-manager"
+  agent_image_name: "kubegems/vc-agent"
+  image_tag_version: v${volcanoVersion}
+  image_registry: registry.cn-beijing.aliyuncs.com
+  image_pull_policy: IfNotPresent
