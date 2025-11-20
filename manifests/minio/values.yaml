@@ -13,7 +13,7 @@ clusterDomain: cluster.local
 ## Set default image, imageTag, and imagePullPolicy. mode is used to indicate the
 ##
 image:
-  repository: quay.io/minio/minio
+  repository: registry.cn-beijing.aliyuncs.com/kubegems/minio
   tag: RELEASE.2024-04-18T19-09-19Z
   pullPolicy: IfNotPresent
 
@@ -24,7 +24,7 @@ imagePullSecrets: []
 ## client used to create a default bucket).
 ##
 mcImage:
-  repository: quay.io/minio/mc
+  repository: registry.cn-beijing.aliyuncs.com/kubegems/mc
   tag: RELEASE.2024-04-18T16-45-29Z
   pullPolicy: IfNotPresent
 
