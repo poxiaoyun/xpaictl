@@ -1,0 +1,7 @@
+driver:
+  version: 570.195.03
+dcgmExporter:
+  serviceMonitor:
+    enabled: true
+    honorLabels: true
+    interval: 10s
