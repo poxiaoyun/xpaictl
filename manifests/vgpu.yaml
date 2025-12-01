@@ -178,8 +178,8 @@ spec:
       priorityClassName: "system-node-critical"
       serviceAccount: volcano-device-plugin
       containers:
-      - image: registry.cn-beijing.aliyuncs.com/kubegems/volcano-vgpu-device-plugin:v1.11.0
-        args: ["--device-split-count=10","--gpu-memory-factor=10"]
+      - image: registry.cn-beijing.aliyuncs.com/kubegems/volcano-vgpu-device-plugin:v1.11.1
+        args: ["--device-split-count=10","--gpu-memory-factor=128"]
         lifecycle:
           postStart:
             exec:
@@ -213,12 +213,16 @@ spec:
           mountPath: /usr/local/vgpu
         - name: hosttmp
           mountPath: /tmp
-      - image: registry.cn-beijing.aliyuncs.com/kubegems/volcano-vgpu-device-plugin:v1.11.0
+      - image: registry.cn-beijing.aliyuncs.com/kubegems/volcano-vgpu-device-plugin:v1.11.1
         name: monitor
         command:
         - /bin/bash
         - -c
         - volcano-vgpu-monitor
+        ports:
+        - containerPort: 9394
+          name: metrics
+          protocol: TCP
         env:
         - name: NVIDIA_VISIBLE_DEVICES
           value: "all"
@@ -283,3 +287,25 @@ spec:
         hostPath:
           path: /var
           type: Directory
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  labels:
+    name: volcano-device-plugin-monitor
+  name: volcano-device-plugin-monitor
+  namespace: volcano-system
+spec:
+  namespaceSelector:
+    matchNames:
+    - volcano-system
+  podMetricsEndpoints:
+  - bearerTokenSecret:
+      key: ""
+    interval: 30s
+    path: /metrics
+    port: metrics
+  selector:
+    matchLabels:
+      name: volcano-device-plugin
