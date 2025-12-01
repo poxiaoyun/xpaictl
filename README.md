@@ -382,7 +382,22 @@ kubectl get ing -n kubegems
 
 # 检查内部服务域名是否已生效
 kubectl get ing -n kubegems-pai
+kubectl get ing -n juicefs-system
 ```
+
+#### 
+
+如果内部服务域名仍然`没有生效`，可尝试执行命令手动删除 ingress 资源 
+
+```
+kubectl delete ing -n kubegems-pai <ing名称> 
+```
+然后重启`xpai controller`服务之后再继续检查结果
+
+```
+kubectl rollout restart deploy kubegems-pai-controller -n kubegems-pai
+```
+
 
 ---
 
@@ -426,7 +441,7 @@ kubectl get ing -n kubegems-pai
 <td>离线多节点部署</td>
 </tr>
 <tr>
-<td><code>sealos reset</code></td>
+<td><code>make reset</code></td>
 <td>卸载平台</td>
 </tr>
 </tbody>

@@ -183,13 +183,19 @@ package-extension-ascend:
 	@$(MAKE) pull-extension-ascend
 	@$(MAKE) save-extension-ascend
 
-
 reset:
 	@bash -c 'source ./scripts/utils.sh; \
 		source ./artifacts/env; \
 		echo "注意，此操作会删除所有XPAI平台数据,包括 License 信息，请谨慎操作！"; \
 		export SEALOS_RUNTIME_ROOT=$${defaultDir}/.sealos; \
-		sealos reset;'
+		export SEALOS_SCP_CHECKSUM=false; \
+		export SEALOS_DATA_ROOT=${defaultDir}/registry; \
+		sealos reset; \
+		systemctl stop registry image-cri-shim; \
+		rm -rf /$${defaultDir}/{openebs,registry,containerd,sealos}; \
+		rm -rf /var/lib/registry; \
+		sealos images |grep -v TAG  |awk '"'"'{print "sealos rmi " $$1":"$$2}'"'"' |bash -c "bash -s"; \
+		echo "XPAI平台数据已清除完毕";'
 
 load:
 	bash -c 'source ./scripts/utils.sh; \
