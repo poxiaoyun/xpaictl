@@ -281,6 +281,51 @@ sysctl -p
 CREATE DATABASE mapi;
 ```
 
+### 4. 托管域名服务
+
+用户如内部无 DNS 服务，可临时采用自带 CoreDNS 服务来解析平台的动态域名。
+
+```yaml
+kubectl edit configmap coredns -n kube-system
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns
+  namespace: kube-system
+data:
+  Corefile: |-
+    .:53 {
+    errors
+    health {
+       lameduck 5s
+    }
+    ready
+    kubernetes cluster.local in-addr.arpa ip6.arpa {
+       pods insecure
+       fallthrough in-addr.arpa ip6.arpa
+       ttl 30
+    }
+
+    ## "poxiaoshi.cn" 是XPAI配置中的 baseHost 域名部分
+    ## "1.1.1.1" 是 A 记录，配置成 Master IP 
+    template IN A xpai.poxiaoshi.cn {
+       match (^.*).xpai.poxiaoshi.cn
+       answer "{{ .Name }} 60 IN A 1.1.1.1"
+       fallthrough
+    }
+    ## 结束
+    prometheus :9153
+    forward . /etc/resolv.conf {
+       max_concurrent 1000
+    }
+    cache 30
+    loop
+    reload
+    loadbalance
+    }
+```
+
 ---
 
 ## Q&A

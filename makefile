@@ -189,7 +189,7 @@ reset:
 		echo "注意，此操作会删除所有XPAI平台数据,包括 License 信息，请谨慎操作！"; \
 		export SEALOS_RUNTIME_ROOT=$${defaultDir}/.sealos; \
 		export SEALOS_SCP_CHECKSUM=false; \
-		export SEALOS_DATA_ROOT=${defaultDir}/registry; \
+		export SEALOS_DATA_ROOT=$${defaultDir}/registry; \
 		sealos reset; \
 		systemctl stop registry image-cri-shim; \
 		rm -rf /$${defaultDir}/{openebs,registry,containerd,sealos}; \

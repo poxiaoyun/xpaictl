@@ -1,0 +1,80 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cr-node-labeller
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["watch", "get", "list", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: labeller
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cr-node-labeller
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: default
+  - kind: ServiceAccount
+    name: default
+    namespace: kube-system
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dcu-label-node
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: dcu-label-node
+  template:
+    metadata:
+      labels:
+        name: dcu-label-node
+    spec:
+      tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      containers:
+      - image: image.sourcefind.cn:5000/dcu/admin/base/dcu-label-node:v2.3.0
+        name: dcu-label-node-cntr
+        securityContext:
+          privileged: true
+#        command: [ "./dcu-label-node" ]
+#        args: [ "-name", "-cu-count", "-vram", "-logtostderr=true", "-stderrthreshold=INFO", "-v=0"]
+        env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+        volumeMounts:
+          - name: dev
+            mountPath: /dev
+          - name: vdev
+            mountPath: /etc/vdev
+          - name: hyhal
+            readOnly: true
+            mountPath: /opt/hyhal
+          - name: hostname
+            mountPath: /etc/hostname
+      volumes:
+        - name: dev
+          hostPath:
+            path: /dev
+        - name: vdev
+          hostPath:
+            path: /etc/vdev
+            type: DirectoryOrCreate
+        - name: hyhal
+          hostPath:
+            path: /opt/hyhal
+            type: DirectoryOrCreate
+        - name: hostname
+          hostPath:
+            path: /etc/hostname
