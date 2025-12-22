@@ -158,30 +158,3 @@ function installVolcano() {
         exit 1
     fi
 }
-
-function installvGPU() {
-    local product="vGPU"
-    local manifestsDir="${script_dir}/manifests"
-    local file
-    local manifest
-
-    manifest=${manifestsDir}/vgpu.yaml
-
-    if ! namespace_exists volcano-system; then
-        if  kubectl create ns volcano-system > /dev/null 2>&1; then
-            log INFO $product "Create namespace/volcano-system successfully."
-        fi
-    fi
-    if [ -e "${manifest}" ]; then
-        if kubectl apply --force -f ${manifest} > /dev/null 2>&1; then
-            log INFO $product "Manifest file ${manifestsDir}/${manifest} is applied."
-        else
-            log ERROR $product "Failed to apply ${manifestsDir}/${manifest}."
-            exit 1
-        fi
-    else
-        log ERROR $product "Can't find manifest ${manifestsDir}/${manifest}."
-        exit 1
-    fi
-
-}

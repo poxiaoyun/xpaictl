@@ -65,7 +65,8 @@ function main(){
     wait_until_running deployment volcano-scheduler volcano-system 300
     wait_until_running deployment volcano-controllers volcano-system 300
     wait_until_running statefulset juicefs-csi-controller juicefs-system 300
-    if [[ "${enableVgpu}" == "true" ]];then
+    
+    if [[ "${installNvidiaOperator}" == "true" ]] && [[ "${enableVgpu}" == "true" ]];then
         installvGPU
     else
         log INFO $product "vGPU is disabled."

@@ -1,5 +1,7 @@
 driver:
-  version: 570.195.03
+  enabled: ${installNvidiaDriver}
+  version: ${nvidiaDriverVersion}
+
 dcgmExporter:
   serviceMonitor:
     enabled: true

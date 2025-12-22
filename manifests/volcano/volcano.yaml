@@ -6,3 +6,34 @@ basic:
   image_tag_version: v1.12.1
   image_registry: registry.cn-beijing.aliyuncs.com
   image_pull_policy: IfNotPresent
+
+
+scheduler_config_override: |
+  actions: enqueue,allocate,backfill,reclaim,preempt
+  metrics:
+    type: prometheus_adaptor
+  tiers:
+  - plugins:
+    - name: priority
+    - name: gang
+    - name: conformance
+  - plugins:
+    - name: overcommit
+    - name: drf
+    - name: predicates
+    - arguments:
+        deviceshare.VGPUEnable: true
+      name: deviceshare
+    - name: proportion
+    - name: nodeorder
+    - arguments:
+        binpack.cpu: 5
+        binpack.memory: 1
+        binpack.resources: nvidia.com/gpu, volcano.sh/vgpu-number
+        binpack.resources.nvidia.com/gpu: 10
+        binpack.resources.volcano.sh/vgpu-number: 10
+        binpack.weight: 20
+      name: binpack
+    - arguments:
+        weight: 10
+      name: numa-aware

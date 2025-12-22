@@ -27,8 +27,11 @@ spec:
         capacity: 10240Gi
         pathStyle: true
         secretKey: minioadmin
+      #gpu-operator和 volcano 移动到外部安装
+      gpu-operator:
+        enabled: false
       volcano:
-        enabled: true
+        enabled: false
         vgpu:
           enabled: false
     node:
