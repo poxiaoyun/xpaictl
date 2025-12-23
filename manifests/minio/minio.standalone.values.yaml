@@ -1,8 +1,0 @@
-nameOverride: "xpai-minio"
-fullnameOverride: "xpai-minio"
-mode: standalone
-rootUser: "minioadmin"
-rootPassword: "minioadmin"
-persistence:
-  enabled: true
-  size: 500Gi

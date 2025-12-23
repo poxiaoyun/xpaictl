@@ -94,3 +94,58 @@ function installvGPU() {
     fi
 
 }
+
+function installHami() {
+
+    local product="hami"
+    local manifestsDir="${script_dir}/manifests/hami"
+    local file
+    local manifest
+    template="hami.yaml"
+
+    if ! command -v helm >/dev/null 2>&1; then
+        log ERROR $product "The 'helm' command is not found. Please check the [modules][kubernetes] runs well."
+        exit 1
+    fi
+    log INFO $product "Trying to install Hami scheduler."
+
+    manifest=${manifestsDir}/${template}
+    if [ -e "${manifest}" ]; then
+        if helm list -n kube-system | grep -q "hami"; then
+            log INFO $product "Hami scheduler already installed. We'll upgrade it."
+            helm upgrade -n kube-system hami -f ${manifest} ${manifestsDir} > /dev/null 2>&1;
+            log INFO $product "Hami scheduler was upgraded"
+        else
+            log INFO $product "Hami scheduler was not installed. We'll install it."
+            helm install -n kube-system hami -f ${manifest} ${manifestsDir} > /dev/null 2>&1;
+            log INFO $product "Hami scheduler was installed"
+        fi
+    else
+        log ERROR $product "Can't find mainifest ${manifest}"
+        exit 1
+    fi
+}
+
+function installNFD() {
+
+    local product="nfd"
+    local manifestsDir="${script_dir}/manifests/nfd"
+    local file
+    local manifest
+
+    if ! command -v helm >/dev/null 2>&1; then
+        log ERROR $product "The 'helm' command is not found. Please check the [modules][kubernetes] runs well."
+        exit 1
+    fi
+
+    if helm list -n kubegems-pai  | grep -q "nfd"; then
+        log INFO $product "NFD already installed. We'll upgrade it."
+        helm upgrade -n kubegems-pai  nfd ${manifestsDir} > /dev/null 2>&1;
+        log INFO $product "NFD was upgraded"
+    else
+        log INFO $product "NFD was not installed. We'll install it."
+        helm install -n kubegems-pai nfd ${manifestsDir} > /dev/null 2>&1;
+        log INFO $product "NFD was installed"
+    fi
+
+}

@@ -138,7 +138,7 @@ function installVolcano() {
 
     manifest=${manifestsDir}/${template}
     if [ -e "${manifest}" ]; then
-        if ! namespace_exists; then
+        if ! namespace_exists volcano-system; then
             if  kubectl create ns volcano-system > /dev/null 2>&1; then
                 log INFO $product "Create namespace/volcano-system successfully."
             fi

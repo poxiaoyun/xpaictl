@@ -1,0 +1,6 @@
+scheduler:
+  kubeScheduler:
+    image:
+      tag: v1.25.10
+devicePlugin:
+  enabled: false

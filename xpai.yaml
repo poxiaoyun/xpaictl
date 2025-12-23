@@ -109,6 +109,12 @@ installNvidiaDriver: false
 # 是否启用GPU虚拟化，英伟达环境下默认开启，支持 CUDA版本 12.8 以下
 enableVgpu: true
 
+# 是否启用Hami调度器支持，默认关闭,此配置仅部署 hami 调度器，在国产GPU(vNPU、vDCU等)需要算力切分调度时开启
+enableHami: false
+
+# 是否启用NFD节点特征发现，默认关闭,此配置仅在需要适配国产 GPU(NPU、DCU等)时开启
+enableNFD: false
+
 ############################### Object Storage Config ######################################
 
 # 是否安装Minio服务，内置Monio服务

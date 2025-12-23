@@ -72,6 +72,13 @@ function main(){
         log INFO $product "vGPU is disabled."
     fi
 
+    if [[ "${enableHami}" == "true" ]];then
+        installHami
+    fi
+    if [[ "${enableNFD}" == "true" ]];then
+        installNFD
+    fi
+
     host="console.${baseHost}"
     token=$(get_gems_token ${host})
     local TIMEOUT=600
